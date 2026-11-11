@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-function RegisterPage() {
+function RegisterPage({ onLoginClick }) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -307,6 +307,32 @@ function RegisterPage() {
         >
           הרשמה
         </button>
+
+        {/* מעבר למסך התחברות */}
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '14px',
+            marginTop: '18px',
+            color: '#555'
+          }}
+        >
+          כבר יש לך חשבון?{' '}
+          <button
+            type="button"
+            onClick={onLoginClick}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#4361ee',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            להתחברות
+          </button>
+        </p>
 
       </form>
     </div>
