@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBuddy - מצא שותף לאימון</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rubik', sans-serif;
+        }
+        
+        body {
+            background-color: #f4f7fe;
+            color: #2b2d42;
+            direction: rtl;
+        }
+        
+        .navbar {
+            background: #ffffff;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #4361ee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links button {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #4a5568;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .nav-links button:hover {
+            color: #4361ee;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(67, 97, 238, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4cc9f0, #4895ef);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .filter-input,
+        .filter-select {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+            background: white;
+        }
+        
+        .filter-input {
+            flex: 1;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+        
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid #edf2f7;
+        }
+        
+        .card-tag {
+            background: #eef2ff;
+            color: #4361ee;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .card-details {
+            color: #718096;
+            font-size: 0.95rem;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-join {
+            background: #2ecc71;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .form-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 14px rgba(46, 204, 113, 0.3);
+        }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🏃‍♂️ FitBuddy</div>
+        <div class="nav-links">
+            <button onclick="showPage('home')">דף הבית</button>
+            <button onclick="showPage('workouts')">אימונים בסביבה</button>
+            <button onclick="showPage('create')">פתיחת אימון</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- דף הבית -->
+        <div id="page-home" class="page-section active">
+            <div class="hero">
+                <h1>מצא שותפים לאימון בקלות</h1>
+                <p>הפלטפורמה המובילה למציאת פרטנרים לריצה, כוח, ואימונים בסביבה הקרובה אלייך</p>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showPage('workouts')">🔍 חפש אימונים</button>
+                    <button class="btn btn-secondary" onclick="showPage('create')">➕ צור אימון חדש</button>
+                </div>
+            </div>
+
+            <h3 class="section-title">אימונים קרובים אליך:</h3>
+            <div id="home-cards-list" class="cards-list"></div>
+        </div>
+
+        <!-- דף רשימת אימונים -->
+        <div id="page-workouts" class="page-section">
+            <div class="hero">
+                <h1>כל האימונים בסביבה</h1>
+                <p>סינון וחיפוש אימונים זמינים לפי המיקום שלך</p>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" id="search-input" class="filter-input" placeholder="🔍 חפש לפי שם אימון או מיקום..." oninput="renderWorkouts()">
+                <select id="category-filter" class="filter-select" onchange="renderWorkouts()">
+                    <option value="הכל">כל הסוגים</option>
+                    <option value="ריצה">ריצה</option>
+                    <option value="כוח">כוח</option>
+                    <option value="יוגה">יוגה</option>
+                    <option value="משחקי כדור">משחקי כדור</option>
+                    <option value="הליכה">הליכה</option>
+                </select>
+            </div>
+
+            <div id="workouts-cards-list" class="cards-list"></div>
+        </div>
+
+        <!-- דף יצירת אימון -->
+        <div id="page-create" class="page-section">
+            <div class="hero">
+                <h1>צור אימון חדש</h1>
+                <p>מלא את הפרטים ופרסם את האימון בקהילה</p>
+            </div>
+
+            <div class="form-card">
+                <form id="create-workout-form" onsubmit="handleCreateWorkout(event)">
+                    <div class="form-group">
+                        <label>שם האימון / כותרת:</label>
+                        <input type="text" id="form-title" class="form-control" placeholder="למשל: ריצת ערב קלה" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>סוג ספורט:</label>
+                            <select id="form-category" class="form-control">
+                                <option>ריצה</option>
+                                <option>כוח</option>
+                                <option>יוגה</option>
+                                <option>משחקי כדור</option>
+                                <option>הליכה</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>רמת קושי:</label>
+                            <select id="form-level" class="form-control">
+                                <option>לכולם</option>
+                                <option>מתחילים</option>
+                                <option>בינוני</option>
+                                <option>מתקדמים</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>מיקום (כתובת / פארק):</label>
+                        <input type="text" id="form-location" class="form-control" placeholder="למשל: גן סאקר, ירושלים" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>תאריך:</label>
+                            <input type="date" id="form-date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>שעה:</label>
+                            <input type="time" id="form-time" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">פרסם אימון עכשיו 🚀</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let workouts = [{
+            id: 1,
+            title: 'ריצת ערב קבוצתית',
+            category: 'ריצה',
+            location: 'גן סאקר',
+            time: '19:00',
+            date: '2026-11-12',
+            organizer: 'משה'
+        }, {
+            id: 2,
+            title: 'אימון כוח ואירובי',
+            category: 'כוח',
+            location: 'בית וגן',
+            time: '20:30',
+            date: '2026-11-13',
+            organizer: 'מירי'
+        }, {
+            id: 3,
+            title: 'יוגה בשקיעה',
+            category: 'יוגה',
+            location: 'פארק המסילה',
+            time: '17:30',
+            date: '2026-11-14',
+            organizer: 'שרה'
+        }, {
+            id: 4,
+            title: 'משחק כדורסל 3v3',
+            category: 'משחקי כדור',
+            location: 'מגרש ספורטק',
+            time: '18:00',
+            date: '2026-11-15',
+            organizer: 'עמית'
+        }];
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            renderWorkouts();
+        }
+
+        function createCardHTML(workout) {
+            return `
+                <div class="card">
+                    <div>
+                        <span class="card-tag">${workout.category}</span>
+                        <div class="card-title">${workout.title}</div>
+                        <div class="card-details">
+                            <span>📍 ${workout.location}</span>
+                            <span>⏰ ${workout.time}</span>
+                            <span>👤 מארגן: ${workout.organizer}</span>
+                        </div>
+                    </div>
+                    <button class="btn-join" onclick="alert('נרשמת בהצלחה לאימון ${workout.title}!')">הצטרף</button>
+                </div>
+            `;
+        }
+
+        function renderWorkouts() {
+            const searchElem = document.getElementById('search-input');
+            const categoryElem = document.getElementById('category-filter');
+
+            const searchVal = searchElem ? searchElem.value.toLowerCase() : '';
+            const categoryVal = categoryElem ? categoryElem.value : 'הכל';
+
+            const filtered = workouts.filter(w => {
+                const matchCat = categoryVal === 'הכל' || w.category === categoryVal;
+                const matchSearch = w.title.toLowerCase().includes(searchVal) || w.location.toLowerCase().includes(searchVal);
+                return matchCat && matchSearch;
+            });
+
+            const homeContainer = document.getElementById('home-cards-list');
+            if (homeContainer) {
+                homeContainer.innerHTML = workouts.slice(0, 2).map(createCardHTML).join('');
+            }
+
+            const workoutsContainer = document.getElementById('workouts-cards-list');
+            if (workoutsContainer) {
+                if (filtered.length > 0) {
+                    workoutsContainer.innerHTML = filtered.map(createCardHTML).join('');
+                } else {
+                    workoutsContainer.innerHTML = '<p style="text-align:center; color:#888;">לא נמצאו אימונים המתאימים לחיפוש.</p>';
+                }
+            }
+        }
+
+        function handleCreateWorkout(e) {
+            e.preventDefault();
+            const newWorkout = {
+                id: Date.now(),
+                title: document.getElementById('form-title').value,
+                category: document.getElementById('form-category').value,
+                location: document.getElementById('form-location').value,
+                date: document.getElementById('form-date').value,
+                time: document.getElementById('form-time').value,
+                organizer: 'מירי'
+            };
+
+            workouts.unshift(newWorkout);
+            document.getElementById('create-workout-form').reset();
+            showPage('workouts');
+        }
+
+        window.onload = function() {
+            renderWorkouts();
+        };
+    </script>
+</body>
+
+</html>
