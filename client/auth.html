@@ -41,6 +41,14 @@
             <h2 style="text-align: center; color: #4361ee; margin-bottom: 18px;">הרשמה ל-FitBuddy</h2>
             <form onsubmit="handleRegisterSubmit(event)">
                 <input type="text" id="reg-name" class="auth-input" placeholder="שם מלא" required>
+                <div style="margin-top: 15px; margin-bottom: 5px; display: flex; gap: 20px; justify-content: center; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1;">
+                    <label style="cursor: pointer; font-weight: 600; color: #4361ee;">
+                        <input type="radio" name="reg-role" value="trainee" checked style="margin-left: 5px;"> אני מתאמן/ת
+                    </label>
+                    <label style="cursor: pointer; font-weight: 600; color: #4361ee;">
+                        <input type="radio" name="reg-role" value="trainer" style="margin-left: 5px;"> אני מאמן/ת
+                    </label>
+                </div>
                 <input type="email" id="reg-email" class="auth-input" placeholder="כתובת אימייל" required>
                 <div style="position: relative;">
                     <input type="password" id="reg-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" oninput="checkPasswordStrength()" required>
@@ -118,8 +126,8 @@
             return hasLen && hasNum && hasSpec;
         }
 
-        function finishLogin(name) {
-            setLoggedInUser(name);
+        function finishLogin(name, role) {
+            setLoggedInUser(name, role);
             const redirectTo = sessionStorage.getItem('fitbuddy_redirect_after_login') || 'index.html';
             sessionStorage.removeItem('fitbuddy_redirect_after_login');
             window.location.href = redirectTo;
@@ -127,14 +135,20 @@
 
         function handleLoginSubmit(e) {
             e.preventDefault();
-            finishLogin();
+            
+            // TODO: שלב חיבור צד-שרת (Backend)
+            // חובה למחוק את ה-'trainer' הקשיח כאן! 
+            // במקום זאת, יש לשלוף את ה-role האמיתי שמגיע ממסד הנתונים אחרי בדיקת האימייל והסיסמה.
+            finishLogin(document.getElementById('login-email').value, 'trainer');
         }
-
         function handleRegisterSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
             const pass = document.getElementById('reg-password').value;
             const confirm = document.getElementById('reg-confirm').value;
+            
+            // שליפת סוג המשתמש (Role) שנבחר בכפתורי הרדיו
+            const role = document.querySelector('input[name="reg-role"]:checked').value;
 
             if (!checkPasswordStrength()) {
                 document.getElementById('reg-error').textContent = 'יש להשלים את כל דרישות הסיסמה';
@@ -144,7 +158,9 @@
                 document.getElementById('reg-error').textContent = 'הסיסמאות אינן תואמות';
                 return;
             }
-            finishLogin(name);
+            
+            // העברת השם וסוג המשתמש לפונקציה השומרת
+            finishLogin(name, role);
         }
     </script>
 </body>
