@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBuddy - התחברות והרשמה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="auth-wrapper">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 430px; margin-bottom: 18px;">
+            <a href="index.html" style="text-decoration:none; font-size: 1.6rem; font-weight: 800; color: #4361ee;">🏃‍♂️ FitBuddy</a>
+            <a href="index.html" style="text-decoration:none; color: #475569; font-weight: 600;">חזרה לאתר ←</a>
+        </div>
+
+        <p id="auth-notice" style="background: #eef2ff; color: #4361ee; padding: 10px 16px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; margin-bottom: 14px; text-align: center; max-width: 430px; width: 100%; display: none;"></p>
+
+        <!-- התחברות -->
+        <div id="login-box" class="auth-card">
+            <h2 style="text-align: center; color: #4361ee; margin-bottom: 18px;">התחברות ל-FitBuddy</h2>
+            <form onsubmit="handleLoginSubmit(event)">
+                <input type="email" id="login-email" class="auth-input" placeholder="כתובת אימייל" required>
+                <div style="position: relative;">
+                    <input type="password" id="login-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" required>
+                    <button type="button" class="eye-btn" onclick="togglePass('login-password', this)">👁️</button>
+                </div>
+                <p id="login-error" style="color: #dc2626; text-align: center; font-size: 13px; margin-top: 10px;"></p>
+                <button type="submit" class="auth-submit-btn">התחברות</button>
+            </form>
+            <p style="text-align: center; font-size: 14px; margin-top: 18px; color: #555;">
+                עדיין אין לך חשבון?
+                <button type="button" onclick="switchAuthMode('register')" style="border:none; background:transparent; color:#4361ee; font-weight:bold; cursor:pointer;">להרשמה</button>
+            </p>
+        </div>
+
+        <!-- הרשמה -->
+        <div id="register-box" class="auth-card" style="display: none;">
+            <h2 style="text-align: center; color: #4361ee; margin-bottom: 18px;">הרשמה ל-FitBuddy</h2>
+            <form onsubmit="handleRegisterSubmit(event)">
+                <input type="text" id="reg-name" class="auth-input" placeholder="שם מלא" required>
+                <input type="email" id="reg-email" class="auth-input" placeholder="כתובת אימייל" required>
+                <div style="position: relative;">
+                    <input type="password" id="reg-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" oninput="checkPasswordStrength()" required>
+                    <button type="button" class="eye-btn" onclick="togglePass('reg-password', this)">👁️</button>
+                </div>
+
+                <div id="pass-rules-box" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-top: 10px;">
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <div id="bar-1" style="flex: 1; height: 6px; border-radius: 5px; background: #dce1e9;"></div>
+                        <div id="bar-2" style="flex: 1; height: 6px; border-radius: 5px; background: #dce1e9;"></div>
+                        <div id="bar-3" style="flex: 1; height: 6px; border-radius: 5px; background: #dce1e9;"></div>
+                    </div>
+                    <div style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">
+                        <span id="rule-len" style="color: #dc2626;">○ 8 תווים לפחות</span>
+                        <span id="rule-num" style="color: #dc2626;">○ 4 ספרות לפחות</span>
+                        <span id="rule-spec" style="color: #dc2626;">○ סימן מיוחד (! @ # $ %)</span>
+                    </div>
+                </div>
+
+                <div style="position: relative;">
+                    <input type="password" id="reg-confirm" class="auth-input" placeholder="אימות סיסמה" style="padding-left: 44px;" required>
+                    <button type="button" class="eye-btn" onclick="togglePass('reg-confirm', this)">👁️</button>
+                </div>
+
+                <p id="reg-error" style="color: #dc2626; text-align: center; font-size: 13px; margin-top: 10px;"></p>
+                <button type="submit" class="auth-submit-btn">הרשמה</button>
+            </form>
+            <p style="text-align: center; font-size: 14px; margin-top: 18px; color: #555;">
+                כבר יש לך חשבון?
+                <button type="button" onclick="switchAuthMode('login')" style="border:none; background:transparent; color:#4361ee; font-weight:bold; cursor:pointer;">להתחברות</button>
+            </p>
+        </div>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script>
+        const notice = sessionStorage.getItem('fitbuddy_auth_notice');
+        if (notice) {
+            const noticeEl = document.getElementById('auth-notice');
+            noticeEl.textContent = notice;
+            noticeEl.style.display = 'block';
+            sessionStorage.removeItem('fitbuddy_auth_notice');
+        }
+
+        function switchAuthMode(mode) {
+            document.getElementById('login-box').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('register-box').style.display = mode === 'register' ? 'block' : 'none';
+        }
+
+        function togglePass(inputId, btn) {
+            const inp = document.getElementById(inputId);
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+            btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+        }
+
+        function checkPasswordStrength() {
+            const pass = document.getElementById('reg-password').value;
+            document.getElementById('pass-rules-box').style.display = pass.length > 0 ? 'block' : 'none';
+
+            const hasLen = pass.length >= 8;
+            const hasNum = (pass.match(/[0-9]/g) || []).length >= 4;
+            const hasSpec = /[^a-zA-Z0-9\u0590-\u05FF\s]/.test(pass);
+
+            document.getElementById('rule-len').style.color = hasLen ? '#16a34a' : '#dc2626';
+            document.getElementById('rule-len').textContent = (hasLen ? '✓ ' : '○ ') + '8 תווים לפחות';
+            document.getElementById('rule-num').style.color = hasNum ? '#16a34a' : '#dc2626';
+            document.getElementById('rule-num').textContent = (hasNum ? '✓ ' : '○ ') + '4 ספרות לפחות';
+            document.getElementById('rule-spec').style.color = hasSpec ? '#16a34a' : '#dc2626';
+            document.getElementById('rule-spec').textContent = (hasSpec ? '✓ ' : '○ ') + 'סימן מיוחד (! @ # $ %)';
+
+            const score = [hasLen, hasNum, hasSpec].filter(Boolean).length;
+            [1, 2, 3].forEach(i => {
+                document.getElementById('bar-' + i).style.background = i <= score ? '#16a34a' : '#dce1e9';
+            });
+            return hasLen && hasNum && hasSpec;
+        }
+
+        function finishLogin(name) {
+            setLoggedInUser(name);
+            const redirectTo = sessionStorage.getItem('fitbuddy_redirect_after_login') || 'index.html';
+            sessionStorage.removeItem('fitbuddy_redirect_after_login');
+            window.location.href = redirectTo;
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            finishLogin();
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const pass = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+
+            if (!checkPasswordStrength()) {
+                document.getElementById('reg-error').textContent = 'יש להשלים את כל דרישות הסיסמה';
+                return;
+            }
+            if (pass !== confirm) {
+                document.getElementById('reg-error').textContent = 'הסיסמאות אינן תואמות';
+                return;
+            }
+            finishLogin(name);
+        }
+    </script>
+</body>
+
+</html>

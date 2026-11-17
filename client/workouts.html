@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBuddy - חיפוש אימונים</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">🏃‍♂️ FitBuddy</a>
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="index.html" id="nav-home">בית</a>
+                <a href="workouts.html" id="nav-workouts">🔍 חיפוש אימונים</a>
+                <a href="create.html" id="nav-create">➕ פעילות חדשה</a>
+                <a href="profile.html" id="nav-profile">👤 דשבורד ופרופיל</a>
+            </div>
+            <div id="guest-actions" class="nav-actions">
+                <a href="auth.html" class="btn-login-nav">התחברות / הרשמה</a>
+            </div>
+            <div id="user-actions" class="nav-actions" style="display: none;">
+                <a href="profile.html" class="profile-avatar-btn" id="nav-avatar">מ</a>
+                <button class="btn-logout" onclick="logoutUser()">התנתק</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section-header">
+            <h2 style="font-size: 1.8rem; color: #1e293b;">חיפוש</h2>
+        </div>
+
+        <div class="search-tabs">
+            <button class="search-tab active" onclick="setSearchTab(this)">פעילויות פתוחות</button>
+            <button class="search-tab" onclick="setSearchTab(this)">שותפים בסביבה</button>
+            <button class="search-tab" onclick="setSearchTab(this)">קבוצות אימון</button>
+        </div>
+
+        <div class="filter-bar">
+            <select id="category-filter" class="filter-select" onchange="renderFilteredWorkouts()">
+                <option value="הכל">כל ענפי הספורט</option>
+                <option value="ריצה">ריצה</option>
+                <option value="כוח">כוח</option>
+                <option value="כדורסל">כדורסל</option>
+                <option value="כדורגל">כדורגל</option>
+                <option value="טניס">טניס</option>
+                <option value="יוגה">יוגה</option>
+                <option value="אופניים">אופניים</option>
+                <option value="הליכה">הליכה</option>
+            </select>
+            <input type="text" id="search-input" class="filter-input" placeholder="🔍 חפש לפי שם אימון או מיקום..." oninput="renderFilteredWorkouts()">
+        </div>
+
+        <div id="workouts-cards-list" class="cards-list"></div>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script>
+        initNavbar('workouts');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const sportParam = urlParams.get('sport');
+        if (sportParam) {
+            document.getElementById('category-filter').value = sportParam;
+        }
+
+        function setSearchTab(tabBtn) {
+            document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+            tabBtn.classList.add('active');
+        }
+
+        function renderFilteredWorkouts() {
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const categoryVal = document.getElementById('category-filter').value;
+
+            const filtered = getWorkouts().filter(w => {
+                const matchCat = categoryVal === 'הכל' || w.category === categoryVal;
+                const matchSearch = w.title.toLowerCase().includes(searchVal) || w.location.toLowerCase().includes(searchVal);
+                return matchCat && matchSearch;
+            });
+
+            const container = document.getElementById('workouts-cards-list');
+            container.innerHTML = filtered.length > 0 ?
+                filtered.map(createCardHTML).join('') :
+                '<div style="text-align:center; padding: 40px; color:#64748b; background:white; border-radius:16px;">לא נמצאו אימונים המתאימים לחיפוש.</div>';
+        }
+
+        renderFilteredWorkouts();
+    </script>
+</body>
+
+</html>
