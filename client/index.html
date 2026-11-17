@@ -27,6 +27,9 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .logo {
@@ -36,6 +39,19 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
         
         .nav-links button {
@@ -44,7 +60,6 @@
             font-size: 1rem;
             font-weight: 500;
             color: #4a5568;
-            margin-right: 20px;
             cursor: pointer;
             transition: color 0.2s;
         }
@@ -53,8 +68,52 @@
             color: #4361ee;
         }
         
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .profile-avatar-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+            color: white;
+            border: 2px solid #e0e7ff;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.25);
+        }
+        
+        .profile-avatar-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 14px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-logout {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-logout:hover {
+            background: #fecaca;
+        }
+        
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 40px auto;
             padding: 0 20px;
         }
@@ -237,6 +296,86 @@
             margin-top: 10px;
             box-shadow: 0 4px 14px rgba(46, 204, 113, 0.3);
         }
+        /* עיצוב עמוד פרופיל ומפה */
+        
+        .profile-grid {
+            display: flex;
+            gap: 25px;
+            align-items: stretch;
+        }
+        
+        .profile-sidebar {
+            flex: 1;
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid #edf2f7;
+            text-align: center;
+        }
+        
+        .profile-big-avatar {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #4cc9f0);
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.25);
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .stat-box strong {
+            display: block;
+            font-size: 1.2rem;
+            color: #4361ee;
+        }
+        
+        .stat-box span {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+        
+        .profile-details-list {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+        
+        .profile-map-card {
+            flex: 2;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid #edf2f7;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .map-frame {
+            width: 100%;
+            height: 340px;
+            border-radius: 14px;
+            border: none;
+            margin-top: 15px;
+        }
         
         .page-section {
             display: none;
@@ -245,17 +384,36 @@
         .page-section.active {
             display: block;
         }
+        
+        @media (max-width: 768px) {
+            .profile-grid {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <nav class="navbar">
-        <div class="logo">🏃‍♂️ FitBuddy</div>
-        <div class="nav-links">
-            <button onclick="showPage('home')">דף הבית</button>
-            <button onclick="showPage('workouts')">אימונים בסביבה</button>
-            <button onclick="showPage('create')">פתיחת אימון</button>
+        <div class="logo" onclick="showPage('home')">🏃‍♂️ FitBuddy</div>
+
+        <div class="nav-right">
+            <div class="nav-links">
+                <button onclick="showPage('home')">דף הבית</button>
+                <button onclick="showPage('workouts')">אימונים בסביבה</button>
+                <button onclick="showPage('create')">פתיחת אימון</button>
+                <button onclick="showPage('profile')">👤 דשבורד ופרופיל</button>
+            </div>
+
+            <div class="nav-actions">
+                <button class="profile-avatar-btn" onclick="showPage('profile')" title="הדשבורד שלי">
+                    מ
+                </button>
+                <button class="btn-logout" onclick="alert('כאן יתחבר מסך ההתחברות/התנתקות של אפרת (Auth)')">
+                    התנתק
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -353,6 +511,52 @@
                 </form>
             </div>
         </div>
+
+        <!-- דף דשבורד ופרופיל -->
+        <div id="page-profile" class="page-section">
+            <div class="hero">
+                <h1>הדשבורד האישי שלי</h1>
+                <p>ניהול פרופיל, העדפות אימון ומפת פעילות בסביבה</p>
+            </div>
+
+            <div class="profile-grid">
+                <div class="profile-sidebar">
+                    <div class="profile-big-avatar">מ</div>
+                    <h2 style="font-size: 1.4rem; color: #1a202c;">מירי</h2>
+                    <span class="card-tag" style="margin-top: 6px;">חברה פעילה ב-FitBuddy</span>
+
+                    <div class="profile-stats">
+                        <div class="stat-box">
+                            <strong>12</strong>
+                            <span>אימונים</span>
+                        </div>
+                        <div class="stat-box">
+                            <strong>8</strong>
+                            <span>שותפים</span>
+                        </div>
+                        <div class="stat-box">
+                            <strong>4.9 ⭐</strong>
+                            <span>דירוג</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-details-list">
+                        <p><strong>📍 אזור אימונים:</strong> בית וגן, ירושלים</p>
+                        <p><strong>💪 רמת כושר:</strong> מתקדמת</p>
+                        <p><strong>🏃‍♀️ ספורט מועדף:</strong> ריצה, כוח והליכה</p>
+                        <p><strong>⏰ זמינות:</strong> שעות הערב (18:00–21:00)</p>
+                    </div>
+                </div>
+
+                <div class="profile-map-card">
+                    <h3 style="font-size: 1.2rem; color: #1a202c;">🗺️ מפת אימונים בסביבה שלי (ירושלים)</h3>
+                    <p style="font-size: 0.9rem; color: #718096; margin-top: 4px;">נקודות מפגש פעילות באיזור בית וגן וגן סאקר</p>
+
+                    <iframe class="map-frame" loading="lazy" allowfullscreen src="https://www.openstreetmap.org/export/embed.html?bbox=35.1700%2C31.7550%2C35.2250%2C31.7900&amp;layer=mapnik&amp;marker=31.7683%2C35.1950">
+                    </iframe>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -362,7 +566,7 @@
             category: 'ריצה',
             location: 'גן סאקר',
             time: '19:00',
-            date: '2026-11-12',
+            date: '2026-11-18',
             organizer: 'משה'
         }, {
             id: 2,
@@ -370,7 +574,7 @@
             category: 'כוח',
             location: 'בית וגן',
             time: '20:30',
-            date: '2026-11-13',
+            date: '2026-11-19',
             organizer: 'מירי'
         }, {
             id: 3,
@@ -378,7 +582,7 @@
             category: 'יוגה',
             location: 'פארק המסילה',
             time: '17:30',
-            date: '2026-11-14',
+            date: '2026-11-20',
             organizer: 'שרה'
         }, {
             id: 4,
@@ -386,7 +590,7 @@
             category: 'משחקי כדור',
             location: 'מגרש ספורטק',
             time: '18:00',
-            date: '2026-11-15',
+            date: '2026-11-21',
             organizer: 'עמית'
         }];
 
