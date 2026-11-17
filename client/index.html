@@ -523,6 +523,7 @@
                 <div class="profile-sidebar">
                     <div class="profile-big-avatar">מ</div>
                     <h2 style="font-size: 1.4rem; color: #1a202c;">מירי</h2>
+                    <button id="edit-profile-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 8px 16px; font-size: 0.9rem;">✏️ עריכת פרופיל</button>
                     <span class="card-tag" style="margin-top: 6px;">חברה פעילה ב-FitBuddy</span>
 
                     <div class="profile-stats">
@@ -540,15 +541,39 @@
                         </div>
                     </div>
 
-                    <div class="profile-details-list">
-                        <p><strong>📍 אזור אימונים:</strong> בית וגן, ירושלים</p>
-                        <p><strong>💪 רמת כושר:</strong> מתקדמת</p>
-                        <p><strong>🏃‍♀️ ספורט מועדף:</strong> ריצה, כוח והליכה</p>
-                        <p><strong>⏰ זמינות:</strong> שעות הערב (18:00–21:00)</p>
-                    </div>
+                    <div class="profile-details-list" id="display-details">
+    <p><strong>📍 אזור אימונים:</strong> <span id="loc-text">בית וגן, ירושלים</span></p>
+    <p><strong>💪 רמת כושר:</strong> <span id="level-text">מתקדמת</span></p>
+    <p><strong>🏃‍♀️ ספורט מועדף:</strong> <span id="sport-text">ריצה, כוח והליכה</span></p>
+    <p><strong>⏰ זמינות:</strong> <span id="time-text">שעות הערב (18:00–21:00)</span></p>
+</div>
+
+<div id="edit-form-section" style="display: none; text-align: right; margin-top: 15px;">
+    <label style="font-size:0.85rem; color:#718096;">שם:</label>
+    <input type="text" id="edit-name" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+    
+    <label style="font-size:0.85rem; color:#718096;">אזור אימונים:</label>
+    <input type="text" id="edit-loc" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+    
+    <label style="font-size:0.85rem; color:#718096;">רמת כושר:</label>
+    <input type="text" id="edit-level" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+    
+    <label style="font-size:0.85rem; color:#718096;">ספורט מועדף:</label>
+    <input type="text" id="edit-sport" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+    
+    <label style="font-size:0.85rem; color:#718096;">זמינות:</label>
+    <input type="text" id="edit-time" class="form-control" style="margin-bottom: 12px; padding: 8px;">
+    
+    <button id="save-profile-btn" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 1rem;">💾 שמור פרטים</button>
+</div>
                 </div>
 
                 <div class="profile-map-card">
+                    <div style="margin-bottom: 35px;">
+    <h3 style="font-size: 1.2rem; color: #1a202c; margin-bottom: 15px;">💪 האימונים הקרובים שלי</h3>
+    <div id="my-workouts-list"></div>
+</div>
+<hr style="border: 0; border-top: 1px solid #edf2f7; margin-bottom: 25px;">
                     <h3 style="font-size: 1.2rem; color: #1a202c;">🗺️ מפת אימונים בסביבה שלי (ירושלים)</h3>
                     <p style="font-size: 0.9rem; color: #718096; margin-top: 4px;">נקודות מפגש פעילות באיזור בית וגן וגן סאקר</p>
 
@@ -671,6 +696,7 @@
             renderWorkouts();
         };
     </script>
+    <script src="profile.js"></script>
 </body>
 
 </html>
