@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBuddy - פתיחת פעילות חדשה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">🏃‍♂️ FitBuddy</a>
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="index.html" id="nav-home">בית</a>
+                <a href="workouts.html" id="nav-workouts">🔍 חיפוש אימונים</a>
+                <a href="create.html" id="nav-create">➕ פעילות חדשה</a>
+                <a href="profile.html" id="nav-profile">👤 דשבורד ופרופיל</a>
+            </div>
+            <div id="user-actions" class="nav-actions">
+                <a href="profile.html" class="profile-avatar-btn" id="nav-avatar">מ</a>
+                <button class="btn-logout" onclick="logoutUser()">התנתק</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h1 style="font-size: 2rem; color: #1e293b;">פתיחת פעילות חדשה</h1>
+            <p style="color: #64748b;">פרסם אימון ומצא פרטנרים תוך דקות</p>
+        </div>
+
+        <div class="form-card">
+            <form onsubmit="handleCreateWorkout(event)">
+                <div class="form-group">
+                    <label>שם הפעילות *</label>
+                    <input type="text" id="form-title" class="form-control" placeholder="למשל: ריצת ערב קלילה בגן סאקר" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ענף ספורט *</label>
+                        <select id="form-category" class="form-control">
+                            <option value="ריצה">ריצה</option>
+                            <option value="כוח">כוח</option>
+                            <option value="כדורסל">כדורסל</option>
+                            <option value="כדורגל">כדורגל</option>
+                            <option value="טניס">טניס</option>
+                            <option value="יוגה">יוגה</option>
+                            <option value="אופניים">אופניים</option>
+                            <option value="הליכה">הליכה</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>מספר משתתפים מקסימלי *</label>
+                        <input type="number" id="form-max-participants" class="form-control" value="14" min="2" max="50" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>מיקום מפגש *</label>
+                    <input type="text" id="form-location" class="form-control" placeholder="למשל: בית וגן / גן סאקר, ירושלים" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>תאריך *</label>
+                        <input type="date" id="form-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>שעה *</label>
+                        <input type="time" id="form-time" class="form-control" required>
+                    </div>
+                </div>
+
+                <button type="button" class="optional-toggle-btn" onclick="toggleOptionalDetails()">
+                    <span id="optional-arrow">⌃</span> פרטים נוספים (אופציונלי)
+                </button>
+
+                <div id="optional-details-box">
+                    <div class="form-group">
+                        <label>לינק Waze</label>
+                        <input type="url" id="form-waze" class="form-control" placeholder="הדבק לינק Waze">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>רמת משחק</label>
+                            <select id="form-level" class="form-control">
+                                <option>חובבני</option>
+                                <option>לכולם</option>
+                                <option>מתחילים</option>
+                                <option>בינוני</option>
+                                <option>מתקדמים</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>עלות השתתפות</label>
+                            <input type="number" id="form-cost" class="form-control" placeholder="חינם" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>הערות נוספות</label>
+                        <textarea id="form-notes" class="form-control" rows="3" placeholder="מידע נוסף למשתתפים..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">פרסם פעילות</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script>
+        if (guardProtectedPage('יש להתחבר כדי לפתוח אימון חדש')) {
+            initNavbar('create');
+        }
+
+        function toggleOptionalDetails() {
+            const box = document.getElementById('optional-details-box');
+            const arrow = document.getElementById('optional-arrow');
+            const isHidden = box.style.display === 'none';
+            box.style.display = isHidden ? 'block' : 'none';
+            arrow.textContent = isHidden ? '⌃' : '⌄';
+        }
+
+        function handleCreateWorkout(e) {
+            e.preventDefault();
+            const list = getWorkouts();
+            list.unshift({
+                id: Date.now(),
+                title: document.getElementById('form-title').value,
+                category: document.getElementById('form-category').value,
+                level: document.getElementById('form-level').value,
+                location: document.getElementById('form-location').value,
+                date: document.getElementById('form-date').value,
+                time: document.getElementById('form-time').value,
+                maxParticipants: Number(document.getElementById('form-max-participants').value) || 14,
+                cost: Number(document.getElementById('form-cost').value) || 0,
+                wazeUrl: document.getElementById('form-waze').value.trim(),
+                notes: document.getElementById('form-notes').value.trim(),
+                organizer: getCurrentUser(),
+                isMine: true
+            });
+            saveWorkouts(list);
+            window.location.href = 'profile.html';
+        }
+    </script>
+</body>
+
+</html>
