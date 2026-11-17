@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 
-function LoginPage({ onRegisterClick }) {
+function LoginPage({ onRegisterClick, onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError('');
 
@@ -16,7 +17,17 @@ function LoginPage({ onRegisterClick }) {
       return;
     }
 
-    alert('הטופס תקין! בהמשך נחבר את ההתחברות לשרת.');
+    setIsLoading(true);
+
+    try {
+      // כאן נחבר בהמשך את בקשת ההתחברות לשרת של עמית.
+      // כרגע אין אימות משתמש אמיתי.
+      setError('ההתחברות עדיין לא מחוברת לשרת. המסך מוכן לחיבור.');
+    } catch (err) {
+      setError('אירעה שגיאה. נסי שוב מאוחר יותר.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -51,6 +62,7 @@ function LoginPage({ onRegisterClick }) {
           autoComplete="email"
           style={inputStyle}
           required
+          disabled={isLoading}
         />
 
         <div style={{ position: 'relative' }}>
@@ -65,14 +77,13 @@ function LoginPage({ onRegisterClick }) {
             autoComplete="current-password"
             style={{ ...inputStyle, paddingLeft: '48px' }}
             required
+            disabled={isLoading}
           />
 
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            aria-label={
-              showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'
-            }
+            aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
             style={eyeStyle}
           >
             {showPassword ? '🙈' : '👁️'}
@@ -89,17 +100,22 @@ function LoginPage({ onRegisterClick }) {
           </p>
         )}
 
-        <button type="submit" style={{
-          ...inputStyle,
-          marginTop: '20px',
-          backgroundColor: '#4361ee',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          fontSize: '16px'
-        }}>
-          התחברות
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{
+            ...inputStyle,
+            marginTop: '20px',
+            backgroundColor: '#4361ee',
+            color: 'white',
+            border: 'none',
+            cursor: isLoading ? 'not-allowed' : 'pointer',
+            opacity: isLoading ? 0.7 : 1,
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}
+        >
+          {isLoading ? 'מתחברת...' : 'התחברות'}
         </button>
       </form>
 
