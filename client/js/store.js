@@ -76,9 +76,14 @@ function getCurrentUser() {
     return localStorage.getItem('fitbuddy_user_name') || 'מירי';
 }
 
-function setLoggedInUser(name) {
+function setLoggedInUser(name, role = 'trainee') {
     localStorage.setItem('fitbuddy_logged_in', 'true');
     if (name) localStorage.setItem('fitbuddy_user_name', name);
+    localStorage.setItem('fitbuddy_user_role', role); // שמירת ההרשאה
+}
+
+function getUserRole() {
+    return localStorage.getItem('fitbuddy_user_role') || 'trainee';
 }
 
 function logoutUser() {
@@ -99,6 +104,8 @@ function guardProtectedPage(noticeMessage) {
 function initNavbar(activePage) {
     const loggedIn = isUserLoggedIn();
     const user = getCurrentUser();
+    const role = getUserRole(); // שליפת סוג המשתמש
+
     const guestEl = document.getElementById('guest-actions');
     const userEl = document.getElementById('user-actions');
     const avatarEl = document.getElementById('nav-avatar');
@@ -106,6 +113,16 @@ function initNavbar(activePage) {
     if (guestEl) guestEl.style.display = loggedIn ? 'none' : 'flex';
     if (userEl) userEl.style.display = loggedIn ? 'flex' : 'none';
     if (avatarEl) avatarEl.textContent = user[0];
+
+    // העלמת כפתורי יצירת אימון אם המשתמש הוא מתאמן
+    if (role === 'trainee') {
+        const navCreate = document.getElementById('nav-create');
+        if (navCreate) navCreate.style.display = 'none';
+
+        document.querySelectorAll('a[href="create.html"]').forEach(btn => {
+            btn.style.display = 'none';
+        });
+    }
 
     const navLink = document.getElementById('nav-' + activePage);
     if (navLink) navLink.classList.add('active-nav');
