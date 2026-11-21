@@ -1,0 +1,23 @@
+model User {
+  id           String   @id @default(uuid(7))
+  name         String
+  email        String   @unique
+  /// Hashing is handled by the auth module (Efrat).
+  passwordHash String
+  role         Role     @default(USER)
+  isBlocked    Boolean  @default(false)
+  area         String?
+  level        Level?
+  bio          String?
+  /// Profile preferences
+  preferredCategory Category?
+  /// Free text, e.g. "ערב" or "19:00"
+  preferredTime     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdWorkouts Workout[]      @relation("WorkoutCreator")
+  registrations   Registration[]
+  reportsFiled    Report[]       @relation("ReportReporter")
+  reportsAgainst  Report[]       @relation("ReportedUser")
+}

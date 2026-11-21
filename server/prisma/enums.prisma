@@ -1,0 +1,31 @@
+// Fixed lists of values, shared by the models and by the Zod schemas (src/schemas).
+
+enum Role {
+  USER
+  ADMIN
+}
+
+/// Sport type. The client maps these values to Hebrew labels.
+enum Category {
+  RUNNING
+  WALKING
+  STRENGTH
+  YOGA
+  BASKETBALL
+  FOOTBALL
+  TENNIS
+  CYCLING
+}
+
+enum Level {
+  ALL
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}

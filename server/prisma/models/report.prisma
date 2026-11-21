@@ -1,0 +1,16 @@
+model Report {
+  id        String       @id @default(uuid(7))
+  reason    String
+  status    ReportStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+
+  reporterId     String
+  reporter       User     @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  /// A report is about a workout, a user, or both.
+  workoutId      String?
+  workout        Workout? @relation(fields: [workoutId], references: [id], onDelete: SetNull)
+  reportedUserId String?
+  reportedUser   User?    @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}

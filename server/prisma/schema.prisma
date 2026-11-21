@@ -1,0 +1,12 @@
+// FitBuddy database schema.
+// The models live in prisma/models/*.prisma - Prisma merges all .prisma files in this folder.
+// After changing any of them run: npm run db:push
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
