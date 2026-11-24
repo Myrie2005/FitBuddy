@@ -7,10 +7,12 @@ function LoginPage({ onRegisterClick, onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError('');
+    setSuccess('');
 
     if (!email.trim() || !password) {
       setError('יש למלא את כל השדות');
@@ -20,11 +22,51 @@ function LoginPage({ onRegisterClick, onLoginSuccess }) {
     setIsLoading(true);
 
     try {
-      // כאן נחבר בהמשך את בקשת ההתחברות לשרת של עמית.
-      // כרגע אין אימות משתמש אמיתי.
-      setError('ההתחברות עדיין לא מחוברת לשרת. המסך מוכן לחיבור.');
+      const response = await fetch(
+        'http://localhost:3000/api/auth/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email.trim().toLowerCase(),
+            password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('כתובת האימייל או הסיסמה שגויות');
+        } else if (response.status === 403) {
+          setError('החשבון שלך חסום. יש לפנות למנהל המערכת');
+        } else if (response.status === 400) {
+          setError('יש לבדוק את הפרטים שהוזנו');
+        } else {
+          setError('אירעה שגיאה בהתחברות. נסי שוב');
+        }
+
+        return;
+      }
+
+      if (!data.token || !data.user) {
+        setError('התקבלה תשובה לא תקינה מהשרת');
+        return;
+      }
+
+      setSuccess(`ההתחברות בוצעה בהצלחה! שלום ${data.user.name}`);
+      setPassword('');
+      setShowPassword(false);
+
+      if (onLoginSuccess) {
+        onLoginSuccess(data.user, data.token);
+      }
+
     } catch (err) {
-      setError('אירעה שגיאה. נסי שוב מאוחר יותר.');
+      setError('לא ניתן להשלים את ההתחברות. נסי שוב מאוחר יותר');
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +104,7 @@ function LoginPage({ onRegisterClick, onLoginSuccess }) {
           autoComplete="email"
           style={inputStyle}
           required
-          disabled={isLoading}
+          disabled={isLoading || !!success}
         />
 
         <div style={{ position: 'relative' }}>
@@ -77,7 +119,7 @@ function LoginPage({ onRegisterClick, onLoginSuccess }) {
             autoComplete="current-password"
             style={{ ...inputStyle, paddingLeft: '48px' }}
             required
-            disabled={isLoading}
+            disabled={isLoading || !!success}
           />
 
           <button
@@ -85,6 +127,7 @@ function LoginPage({ onRegisterClick, onLoginSuccess }) {
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
             style={eyeStyle}
+            disabled={isLoading || !!success}
           >
             {showPassword ? '🙈' : '👁️'}
           </button>
@@ -100,47 +143,70 @@ function LoginPage({ onRegisterClick, onLoginSuccess }) {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          style={{
-            ...inputStyle,
-            marginTop: '20px',
-            backgroundColor: '#4361ee',
-            color: 'white',
-            border: 'none',
-            cursor: isLoading ? 'not-allowed' : 'pointer',
-            opacity: isLoading ? 0.7 : 1,
-            fontWeight: 'bold',
-            fontSize: '16px'
-          }}
-        >
-          {isLoading ? 'מתחברת...' : 'התחברות'}
-        </button>
+        {success && (
+          <div
+            role="status"
+            style={{
+              backgroundColor: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              borderRadius: '8px',
+              padding: '14px',
+              marginTop: '16px',
+              color: '#16a34a',
+              textAlign: 'center',
+              fontSize: '14px'
+            }}
+          >
+            ✓ {success}
+          </div>
+        )}
+
+        {!success && (
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              ...inputStyle,
+              marginTop: '20px',
+              backgroundColor: '#4361ee',
+              color: 'white',
+              border: 'none',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              opacity: isLoading ? 0.7 : 1,
+              fontWeight: 'bold',
+              fontSize: '16px'
+            }}
+          >
+            {isLoading ? 'מתחברת...' : 'התחברות'}
+          </button>
+        )}
       </form>
 
-      <p style={{
-        textAlign: 'center',
-        fontSize: '14px',
-        marginTop: '20px',
-        color: '#555'
-      }}>
-        עדיין אין לך חשבון?{' '}
-        <button
-          type="button"
-          onClick={onRegisterClick}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            color: '#4361ee',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          להרשמה
-        </button>
-      </p>
+      {!success && (
+        <p style={{
+          textAlign: 'center',
+          fontSize: '14px',
+          marginTop: '20px',
+          color: '#555'
+        }}>
+          עדיין אין לך חשבון?{' '}
+          <button
+            type="button"
+            onClick={onRegisterClick}
+            disabled={isLoading}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#4361ee',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            להרשמה
+          </button>
+        </p>
+      )}
     </div>
   );
 }

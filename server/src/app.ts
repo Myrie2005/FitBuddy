@@ -1,9 +1,11 @@
+
 import cors from 'cors';
 import express from 'express';
 import { config, corsOrigin } from './config/all.js';
 import { prisma } from './core/prisma.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { adminRouter } from './routes/admin.js';
+import { authRouter } from './routes/auth.js';
 import { reportsRouter } from './routes/reports.js';
 import { usersRouter } from './routes/users.js';
 import { workoutsRouter } from './routes/workouts.js';
@@ -23,6 +25,9 @@ export function createApp() {
       res.status(503).json({ ok: false, database: 'down', time: new Date().toISOString() });
     }
   });
+
+  // Authentication - Register and Login
+  app.use('/api/auth', authRouter);
 
   app.use('/api/workouts', workoutsRouter);
   app.use('/api/users', usersRouter);
