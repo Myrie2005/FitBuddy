@@ -1,6 +1,9 @@
 
 import React, { useState } from 'react';
 
+const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function RegisterPage({ onLoginClick }) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -9,6 +12,8 @@ function RegisterPage({ onLoginClick }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // בדיקת דרישות הסיסמה
   const hasEightCharacters = password.length >= 8;
@@ -35,9 +40,13 @@ function RegisterPage({ onLoginClick }) {
     (item) => item.valid
   ).length;
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+
+    if (loading || success) return;
+
     setError('');
+    setSuccess('');
 
     if (
       !fullName.trim() ||
@@ -46,6 +55,14 @@ function RegisterPage({ onLoginClick }) {
       !confirmPassword
     ) {
       setError('יש למלא את כל השדות');
+      return;
+    }
+
+    if (
+      fullName.trim().length < 2 ||
+      fullName.trim().length > 50
+    ) {
+      setError('השם חייב להכיל בין 2 ל-50 תווים');
       return;
     }
 
@@ -59,7 +76,67 @@ function RegisterPage({ onLoginClick }) {
       return;
     }
 
-    alert('הטופס תקין! בהמשך נחבר אותו לשרת.');
+    setLoading(true);
+
+    try {
+      // שליחת פרטי ההרשמה לשרת
+      const response = await fetch(
+        `${API_URL}/api/auth/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: fullName.trim(),
+            email: email.trim().toLowerCase(),
+            password: password
+          })
+        }
+      );
+
+      const data = await response.json().catch(() => null);
+
+      // טיפול בשגיאות מהשרת
+      if (!response.ok) {
+        if (
+          response.status === 409 ||
+          data?.code === 'EMAIL_EXISTS'
+        ) {
+          setError(
+            'כתובת האימייל כבר רשומה במערכת. יש לעבור למסך ההתחברות.'
+          );
+        } else if (response.status === 400) {
+          setError('פרטי ההרשמה אינם תקינים');
+        } else {
+          setError('ההרשמה נכשלה. יש לנסות שוב.');
+        }
+
+        return;
+      }
+
+      if (response.status !== 201 || !data?.user?.id) {
+        setError('התקבלה תשובה לא צפויה מהשרת');
+        return;
+      }
+
+      // הרשמה הצליחה
+      setSuccess('ההרשמה בוצעה בהצלחה! כעת ניתן להתחבר.');
+
+      setFullName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+
+    } catch (error) {
+      setError(
+        'לא ניתן להתחבר לשרת. יש לבדוק את החיבור ולנסות שוב.'
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -94,6 +171,7 @@ function RegisterPage({ onLoginClick }) {
           onChange={(e) => setFullName(e.target.value)}
           style={inputStyle}
           autoComplete="name"
+          disabled={loading || !!success}
           required
         />
 
@@ -105,6 +183,7 @@ function RegisterPage({ onLoginClick }) {
           onChange={(e) => setEmail(e.target.value)}
           style={inputStyle}
           autoComplete="email"
+          disabled={loading || !!success}
           required
         />
 
@@ -123,6 +202,7 @@ function RegisterPage({ onLoginClick }) {
               paddingLeft: '48px'
             }}
             autoComplete="new-password"
+            disabled={loading || !!success}
             required
           />
 
@@ -133,6 +213,7 @@ function RegisterPage({ onLoginClick }) {
               showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'
             }
             style={eyeStyle}
+            disabled={loading || !!success}
           >
             {showPassword ? '🙈' : '👁️'}
           </button>
@@ -238,6 +319,7 @@ function RegisterPage({ onLoginClick }) {
               paddingLeft: '48px'
             }}
             autoComplete="new-password"
+            disabled={loading || !!success}
             required
           />
 
@@ -252,6 +334,7 @@ function RegisterPage({ onLoginClick }) {
                 : 'הצג סיסמה'
             }
             style={eyeStyle}
+            disabled={loading || !!success}
           >
             {showConfirmPassword ? '🙈' : '👁️'}
           </button>
@@ -291,22 +374,46 @@ function RegisterPage({ onLoginClick }) {
           </p>
         )}
 
+        {/* הודעת הצלחה */}
+        {success && (
+          <p
+            role="status"
+            style={{
+              color: '#16a34a',
+              backgroundColor: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              borderRadius: '8px',
+              padding: '12px',
+              textAlign: 'center',
+              fontSize: '14px',
+              marginTop: '12px'
+            }}
+          >
+            ✓ {success}
+          </p>
+        )}
+
         {/* כפתור הרשמה */}
-        <button
-          type="submit"
-          style={{
-            ...inputStyle,
-            marginTop: '20px',
-            backgroundColor: '#4361ee',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '16px'
-          }}
-        >
-          הרשמה
-        </button>
+        {!success && (
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...inputStyle,
+              marginTop: '20px',
+              backgroundColor: loading
+                ? '#9ca3af'
+                : '#4361ee',
+              color: 'white',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontWeight: 'bold',
+              fontSize: '16px'
+            }}
+          >
+            {loading ? 'מבצע הרשמה...' : 'הרשמה'}
+          </button>
+        )}
 
         {/* מעבר למסך התחברות */}
         <p
@@ -317,16 +424,20 @@ function RegisterPage({ onLoginClick }) {
             color: '#555'
           }}
         >
-          כבר יש לך חשבון?{' '}
+          {success
+            ? 'החשבון שלך מוכן! '
+            : 'כבר יש לך חשבון? '}
+
           <button
             type="button"
             onClick={onLoginClick}
+            disabled={loading}
             style={{
               border: 'none',
               background: 'transparent',
               color: '#4361ee',
               fontWeight: 'bold',
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
               fontSize: '14px'
             }}
           >
