@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it } from 'vitest';
 import bcrypt from 'bcryptjs';
 import { api, prisma, resetDb } from './helpers.js';
@@ -24,6 +23,7 @@ describe('POST /api/auth/register', () => {
       name: testUser.name,
       email: testUser.email,
       role: 'USER',
+      isTrainer: false,
     });
 
     expect(res.body.user).not.toHaveProperty('passwordHash');
@@ -106,6 +106,40 @@ describe('POST /api/auth/register', () => {
 
     expect(user.role).toBe('USER');
   });
+
+  it('stores new users without trainer permissions', async () => {
+    const res = await api()
+      .post('/api/auth/register')
+      .send(testUser);
+
+    expect(res.status).toBe(201);
+    expect(res.body.user.isTrainer).toBe(false);
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: testUser.email },
+    });
+
+    expect(user.isTrainer).toBe(false);
+  });
+
+  it('does not allow users to grant themselves trainer permissions', async () => {
+    const res = await api()
+      .post('/api/auth/register')
+      .send({
+        ...testUser,
+        isTrainer: true,
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.user.isTrainer).toBe(false);
+    expect(res.body.user.role).toBe('USER');
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: testUser.email },
+    });
+
+    expect(user.isTrainer).toBe(false);
+  });
 });
 
 describe('POST /api/auth/login', () => {
@@ -129,6 +163,7 @@ describe('POST /api/auth/login', () => {
     expect(typeof res.body.token).toBe('string');
     expect(res.body.token.length).toBeGreaterThan(0);
     expect(res.body.user.email).toBe(testUser.email);
+    expect(res.body.user.isTrainer).toBe(false);
     expect(res.body.user).not.toHaveProperty('passwordHash');
   });
 
@@ -201,5 +236,26 @@ describe('POST /api/auth/login', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.email).toBe(testUser.email);
+  });
+
+  it('returns trainer permissions when an approved trainer logs in', async () => {
+    // Simulate a user who has already been approved as a trainer.
+    await prisma.user.update({
+      where: { email: testUser.email },
+      data: { isTrainer: true },
+    });
+
+    const res = await api()
+      .post('/api/auth/login')
+      .send({
+        email: testUser.email,
+        password: testUser.password,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.user.isTrainer).toBe(true);
+    expect(res.body.user.role).toBe('USER');
+    expect(typeof res.body.token).toBe('string');
+    expect(res.body.token.length).toBeGreaterThan(0);
   });
 });

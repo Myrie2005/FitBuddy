@@ -17,6 +17,7 @@ export const adminUpdateUserSchema = z
   .object({
     role: z.enum(Role),
     isBlocked: z.boolean(),
+    isTrainer: z.boolean(),
   })
   .partial()
   .refine((o) => Object.keys(o).length > 0, 'Nothing to update');

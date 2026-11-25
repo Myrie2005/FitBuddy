@@ -5,6 +5,7 @@ model User {
   /// Hashing is handled by the auth module (Efrat).
   passwordHash String
   role         Role     @default(USER)
+  isTrainer    Boolean  @default(false)
   isBlocked    Boolean  @default(false)
   area         String?
   level        Level?

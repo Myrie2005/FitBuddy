@@ -18,40 +18,40 @@
 
         <p id="auth-notice" style="background: #eef2ff; color: #4361ee; padding: 10px 16px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; margin-bottom: 14px; text-align: center; max-width: 430px; width: 100%; display: none;"></p>
 
-        <!-- התחברות -->
+        <!-- Login -->
         <div id="login-box" class="auth-card">
             <h2 style="text-align: center; color: #4361ee; margin-bottom: 18px;">התחברות ל-FitBuddy</h2>
+
             <form onsubmit="handleLoginSubmit(event)">
-                <input type="email" id="login-email" class="auth-input" placeholder="כתובת אימייל" required>
+                <input type="email" id="login-email" class="auth-input" placeholder="כתובת אימייל" autocomplete="email" required>
+
                 <div style="position: relative;">
-                    <input type="password" id="login-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" required>
+                    <input type="password" id="login-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" autocomplete="current-password" required>
                     <button type="button" class="eye-btn" onclick="togglePass('login-password', this)">👁️</button>
                 </div>
-                <p id="login-error" style="color: #dc2626; text-align: center; font-size: 13px; margin-top: 10px;"></p>
-                <button type="submit" class="auth-submit-btn">התחברות</button>
+
+                <p id="login-error" role="alert" style="color: #dc2626; text-align: center; font-size: 13px; margin-top: 10px;"></p>
+
+                <button type="submit" id="login-submit" class="auth-submit-btn">התחברות</button>
             </form>
+
             <p style="text-align: center; font-size: 14px; margin-top: 18px; color: #555;">
                 עדיין אין לך חשבון?
                 <button type="button" onclick="switchAuthMode('register')" style="border:none; background:transparent; color:#4361ee; font-weight:bold; cursor:pointer;">להרשמה</button>
             </p>
         </div>
 
-        <!-- הרשמה -->
+        <!-- Registration -->
         <div id="register-box" class="auth-card" style="display: none;">
             <h2 style="text-align: center; color: #4361ee; margin-bottom: 18px;">הרשמה ל-FitBuddy</h2>
+
             <form onsubmit="handleRegisterSubmit(event)">
-                <input type="text" id="reg-name" class="auth-input" placeholder="שם מלא" required>
-                <div style="margin-top: 15px; margin-bottom: 5px; display: flex; gap: 20px; justify-content: center; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1;">
-                    <label style="cursor: pointer; font-weight: 600; color: #4361ee;">
-                        <input type="radio" name="reg-role" value="trainee" checked style="margin-left: 5px;"> אני מתאמן/ת
-                    </label>
-                    <label style="cursor: pointer; font-weight: 600; color: #4361ee;">
-                        <input type="radio" name="reg-role" value="trainer" style="margin-left: 5px;"> אני מאמן/ת
-                    </label>
-                </div>
-                <input type="email" id="reg-email" class="auth-input" placeholder="כתובת אימייל" required>
+                <input type="text" id="reg-name" class="auth-input" placeholder="שם מלא" minlength="2" maxlength="50" autocomplete="name" required>
+
+                <input type="email" id="reg-email" class="auth-input" placeholder="כתובת אימייל" autocomplete="email" required>
+
                 <div style="position: relative;">
-                    <input type="password" id="reg-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" oninput="checkPasswordStrength()" required>
+                    <input type="password" id="reg-password" class="auth-input" placeholder="סיסמה" style="padding-left: 44px;" autocomplete="new-password" oninput="checkPasswordStrength()" required>
                     <button type="button" class="eye-btn" onclick="togglePass('reg-password', this)">👁️</button>
                 </div>
 
@@ -61,6 +61,7 @@
                         <div id="bar-2" style="flex: 1; height: 6px; border-radius: 5px; background: #dce1e9;"></div>
                         <div id="bar-3" style="flex: 1; height: 6px; border-radius: 5px; background: #dce1e9;"></div>
                     </div>
+
                     <div style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">
                         <span id="rule-len" style="color: #dc2626;">○ 8 תווים לפחות</span>
                         <span id="rule-num" style="color: #dc2626;">○ 4 ספרות לפחות</span>
@@ -69,13 +70,19 @@
                 </div>
 
                 <div style="position: relative;">
-                    <input type="password" id="reg-confirm" class="auth-input" placeholder="אימות סיסמה" style="padding-left: 44px;" required>
+                    <input type="password" id="reg-confirm" class="auth-input" placeholder="אימות סיסמה" style="padding-left: 44px;" autocomplete="new-password" required>
                     <button type="button" class="eye-btn" onclick="togglePass('reg-confirm', this)">👁️</button>
                 </div>
 
-                <p id="reg-error" style="color: #dc2626; text-align: center; font-size: 13px; margin-top: 10px;"></p>
-                <button type="submit" class="auth-submit-btn">הרשמה</button>
+                <p style="font-size: 12px; color: #64748b; text-align: center; margin-top: 12px;">
+                    כל משתמש חדש נרשם כמתאמן. לקבלת הרשאת מאמן יש לפנות למנהלי המערכת.
+                </p>
+
+                <p id="reg-error" role="alert" style="color: #dc2626; text-align: center; font-size: 13px; margin-top: 10px;"></p>
+
+                <button type="submit" id="reg-submit" class="auth-submit-btn">הרשמה</button>
             </form>
+
             <p style="text-align: center; font-size: 14px; margin-top: 18px; color: #555;">
                 כבר יש לך חשבון?
                 <button type="button" onclick="switchAuthMode('login')" style="border:none; background:transparent; color:#4361ee; font-weight:bold; cursor:pointer;">להתחברות</button>
@@ -83,84 +90,250 @@
         </div>
     </div>
 
+    <script src="js/api.js"></script>
     <script src="js/store.js"></script>
+
     <script>
-        const notice = sessionStorage.getItem('fitbuddy_auth_notice');
-        if (notice) {
+        let authPending = false;
+
+        function showNotice(message) {
             const noticeEl = document.getElementById('auth-notice');
-            noticeEl.textContent = notice;
+            noticeEl.textContent = message;
             noticeEl.style.display = 'block';
+        }
+
+        const notice = sessionStorage.getItem('fitbuddy_auth_notice');
+
+        if (notice) {
+            showNotice(notice);
             sessionStorage.removeItem('fitbuddy_auth_notice');
         }
 
         function switchAuthMode(mode) {
-            document.getElementById('login-box').style.display = mode === 'login' ? 'block' : 'none';
-            document.getElementById('register-box').style.display = mode === 'register' ? 'block' : 'none';
+            if (authPending) return;
+
+            document.getElementById('login-box').style.display =
+                mode === 'login' ? 'block' : 'none';
+
+            document.getElementById('register-box').style.display =
+                mode === 'register' ? 'block' : 'none';
+
+            document.getElementById('login-error').textContent = '';
+            document.getElementById('reg-error').textContent = '';
+            document.getElementById('auth-notice').style.display = 'none';
         }
 
         function togglePass(inputId, btn) {
             const inp = document.getElementById(inputId);
+
             inp.type = inp.type === 'password' ? 'text' : 'password';
+
             btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
         }
 
         function checkPasswordStrength() {
             const pass = document.getElementById('reg-password').value;
-            document.getElementById('pass-rules-box').style.display = pass.length > 0 ? 'block' : 'none';
+
+            document.getElementById('pass-rules-box').style.display =
+                pass.length > 0 ? 'block' : 'none';
 
             const hasLen = pass.length >= 8;
             const hasNum = (pass.match(/[0-9]/g) || []).length >= 4;
             const hasSpec = /[^a-zA-Z0-9\u0590-\u05FF\s]/.test(pass);
 
-            document.getElementById('rule-len').style.color = hasLen ? '#16a34a' : '#dc2626';
-            document.getElementById('rule-len').textContent = (hasLen ? '✓ ' : '○ ') + '8 תווים לפחות';
-            document.getElementById('rule-num').style.color = hasNum ? '#16a34a' : '#dc2626';
-            document.getElementById('rule-num').textContent = (hasNum ? '✓ ' : '○ ') + '4 ספרות לפחות';
-            document.getElementById('rule-spec').style.color = hasSpec ? '#16a34a' : '#dc2626';
-            document.getElementById('rule-spec').textContent = (hasSpec ? '✓ ' : '○ ') + 'סימן מיוחד (! @ # $ %)';
+            document.getElementById('rule-len').style.color =
+                hasLen ? '#16a34a' : '#dc2626';
+
+            document.getElementById('rule-len').textContent =
+                (hasLen ? '✓ ' : '○ ') + '8 תווים לפחות';
+
+            document.getElementById('rule-num').style.color =
+                hasNum ? '#16a34a' : '#dc2626';
+
+            document.getElementById('rule-num').textContent =
+                (hasNum ? '✓ ' : '○ ') + '4 ספרות לפחות';
+
+            document.getElementById('rule-spec').style.color =
+                hasSpec ? '#16a34a' : '#dc2626';
+
+            document.getElementById('rule-spec').textContent =
+                (hasSpec ? '✓ ' : '○ ') + 'סימן מיוחד (! @ # $ %)';
 
             const score = [hasLen, hasNum, hasSpec].filter(Boolean).length;
+
             [1, 2, 3].forEach(i => {
-                document.getElementById('bar-' + i).style.background = i <= score ? '#16a34a' : '#dce1e9';
+                document.getElementById('bar-' + i).style.background =
+                    i <= score ? '#16a34a' : '#dce1e9';
             });
+
             return hasLen && hasNum && hasSpec;
         }
 
-        function finishLogin(name, role) {
-            setLoggedInUser(name, role);
-            const redirectTo = sessionStorage.getItem('fitbuddy_redirect_after_login') || 'index.html';
+        function finishLogin(user, token) {
+            setLoggedInUser(user, token);
+
+            const allowedPages = [
+                'index.html',
+                'workouts.html',
+                'profile.html',
+                'create.html'
+            ];
+
+            let redirectTo = sessionStorage.getItem(
+                'fitbuddy_redirect_after_login'
+            );
+
             sessionStorage.removeItem('fitbuddy_redirect_after_login');
+
+            if (!allowedPages.includes(redirectTo)) {
+                redirectTo = 'index.html';
+            }
+
+            if (redirectTo === 'create.html' && !canCreateWorkout()) {
+                redirectTo = 'index.html';
+            }
+
             window.location.href = redirectTo;
         }
 
-        function handleLoginSubmit(e) {
+        async function handleLoginSubmit(e) {
             e.preventDefault();
-            
-            // TODO: שלב חיבור צד-שרת (Backend)
-            // חובה למחוק את ה-'trainer' הקשיח כאן! 
-            // במקום זאת, יש לשלוף את ה-role האמיתי שמגיע ממסד הנתונים אחרי בדיקת האימייל והסיסמה.
-            finishLogin(document.getElementById('login-email').value, 'trainer');
+
+            if (authPending) return;
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const errorEl = document.getElementById('login-error');
+            const submitBtn = document.getElementById('login-submit');
+
+            errorEl.textContent = '';
+            authPending = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'מתחבר...';
+
+            try {
+                const data = await apiFetch('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                });
+
+                if (!data?.token || !data?.user?.id) {
+                    throw new Error('Invalid login response');
+                }
+
+                finishLogin(data.user, data.token);
+
+            } catch (error) {
+                if (error.status === 401) {
+                    errorEl.textContent =
+                        'כתובת האימייל או הסיסמה שגויות. אם עדיין אין לך חשבון, יש להירשם.';
+                } else if (error.status === 403) {
+                    errorEl.textContent =
+                        'החשבון חסום. יש לפנות למנהלי המערכת.';
+                } else if (error.status === 400) {
+                    errorEl.textContent =
+                        'יש לבדוק את כתובת האימייל והסיסמה.';
+                } else {
+                    errorEl.textContent =
+                        'לא ניתן להתחבר כרגע. יש לנסות שוב מאוחר יותר.';
+                }
+            } finally {
+                authPending = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'התחברות';
+            }
         }
-        function handleRegisterSubmit(e) {
+
+        async function handleRegisterSubmit(e) {
             e.preventDefault();
+
+            if (authPending) return;
+
             const name = document.getElementById('reg-name').value.trim();
-            const pass = document.getElementById('reg-password').value;
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
             const confirm = document.getElementById('reg-confirm').value;
-            
-            // שליפת סוג המשתמש (Role) שנבחר בכפתורי הרדיו
-            const role = document.querySelector('input[name="reg-role"]:checked').value;
+
+            const errorEl = document.getElementById('reg-error');
+            const submitBtn = document.getElementById('reg-submit');
+
+            errorEl.textContent = '';
+
+            if (name.length < 2 || name.length > 50) {
+                errorEl.textContent =
+                    'השם חייב להכיל בין 2 ל-50 תווים.';
+                return;
+            }
 
             if (!checkPasswordStrength()) {
-                document.getElementById('reg-error').textContent = 'יש להשלים את כל דרישות הסיסמה';
+                errorEl.textContent =
+                    'יש להשלים את כל דרישות הסיסמה.';
                 return;
             }
-            if (pass !== confirm) {
-                document.getElementById('reg-error').textContent = 'הסיסמאות אינן תואמות';
+
+            if (password !== confirm) {
+                errorEl.textContent = 'הסיסמאות אינן תואמות.';
                 return;
             }
-            
-            // העברת השם וסוג המשתמש לפונקציה השומרת
-            finishLogin(name, role);
+
+            authPending = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'נרשם...';
+
+            let registrationSucceeded = false;
+
+            try {
+                await apiFetch('/api/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password
+                    })
+                });
+
+                registrationSucceeded = true;
+
+            } catch (error) {
+                if (error.status === 409 || error.code === 'EMAIL_EXISTS') {
+                    errorEl.textContent =
+                        'כתובת האימייל כבר רשומה במערכת. יש לעבור למסך ההתחברות.';
+                } else if (error.status === 400) {
+                    errorEl.textContent =
+                        'פרטי ההרשמה אינם תקינים. יש לבדוק את הנתונים.';
+                } else {
+                    errorEl.textContent =
+                        'לא ניתן להשלים את ההרשמה כרגע. יש לנסות שוב מאוחר יותר.';
+                }
+            } finally {
+                authPending = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'הרשמה';
+            }
+
+            if (registrationSucceeded) {
+                document.getElementById('reg-name').value = '';
+                document.getElementById('reg-email').value = '';
+                document.getElementById('reg-password').value = '';
+                document.getElementById('reg-confirm').value = '';
+
+                checkPasswordStrength();
+
+                switchAuthMode('login');
+
+                document.getElementById('login-email').value = email;
+                document.getElementById('login-password').value = '';
+
+                showNotice(
+                    'ההרשמה הושלמה בהצלחה! עכשיו אפשר להתחבר לחשבון.'
+                );
+
+                document.getElementById('login-password').focus();
+            }
         }
     </script>
 </body>

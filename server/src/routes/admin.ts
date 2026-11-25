@@ -20,6 +20,7 @@ adminRouter.get('/users', async (_req, res) => {
       name: true,
       email: true,
       role: true,
+      isTrainer: true,
       isBlocked: true,
       createdAt: true,
       _count: { select: { createdWorkouts: true, reportsAgainst: true } },
@@ -28,17 +29,28 @@ adminRouter.get('/users', async (_req, res) => {
   res.json(users);
 });
 
-// PATCH /api/admin/users/:id  { role?, isBlocked? }
+// PATCH /api/admin/users/:id  { role?, isBlocked?, isTrainer? }
 adminRouter.patch('/users/:id', async (req, res) => {
   const { id } = idParam.parse(req.params);
   const data = adminUpdateUserSchema.parse(req.body);
-  if (id === req.user!.id) throw new HttpError(400, 'You cannot change your own role or block yourself');
+
+  if (id === req.user!.id) {
+    throw new HttpError(400, 'You cannot change your own account permissions');
+  }
 
   const user = await prisma.user.update({
     where: { id },
     data,
-    select: { id: true, name: true, email: true, role: true, isBlocked: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      isTrainer: true,
+      isBlocked: true,
+    },
   });
+
   res.json(user);
 });
 

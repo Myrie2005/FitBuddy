@@ -62,7 +62,47 @@ describe('/api/users/me', () => {
     expect((await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).role).toBe('USER');
   });
 
+  it('cannot grant trainer permissions through the profile', async () => {
+    const res = await api()
+      .patch('/api/users/me')
+      .set(user.auth)
+      .send({ name: 'מירי', isTrainer: true });
+
+    expect(res.status).toBe(200);
+
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+    });
+
+    expect(updatedUser.isTrainer).toBe(false);
+  });
+
+  it('rejects a profile update containing only trainer permissions', async () => {
+    const res = await api()
+      .patch('/api/users/me')
+      .set(user.auth)
+      .send({ isTrainer: true });
+
+    expect(res.status).toBe(400);
+
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+    });
+
+    expect(updatedUser.isTrainer).toBe(false);
+  });
+
   it('lists workouts I organize and workouts I joined separately', async () => {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isTrainer: true },
+    });
+
+    await prisma.user.update({
+      where: { id: other.id },
+      data: { isTrainer: true },
+    });
+
     await createWorkout(user, { title: 'שלי' });
     const theirs = await createWorkout(other, { title: 'של שרה' });
     await api().post(`/api/workouts/${theirs.id}/register`).set(user.auth);
@@ -75,6 +115,11 @@ describe('/api/users/me', () => {
 
 describe('GET /api/users/:id', () => {
   it('returns a public profile without email', async () => {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isTrainer: true },
+    });
+
     await createWorkout(user);
     const res = await api().get(`/api/users/${user.id}`);
     expect(res.status).toBe(200);
@@ -84,5 +129,29 @@ describe('GET /api/users/:id', () => {
 
   it('404 for a missing user', async () => {
     expect((await api().get('/api/users/01a1fdc3-0000-7000-8000-000000000000')).status).toBe(404);
+  });
+});
+describe('trainer status in profile', () => {
+  it('returns the current trainer status in my profile', async () => {
+    const before = await api()
+      .get('/api/users/me')
+      .set(user.auth);
+
+    expect(before.status).toBe(200);
+    expect(before.body.isTrainer).toBe(false);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isTrainer: true },
+    });
+
+    const after = await api()
+      .get('/api/users/me')
+      .set(user.auth);
+
+    expect(after.status).toBe(200);
+    expect(after.body.isTrainer).toBe(true);
+    expect(after.body.role).toBe('USER');
+    expect(after.body).not.toHaveProperty('passwordHash');
   });
 });

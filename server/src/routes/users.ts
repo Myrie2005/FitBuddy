@@ -19,18 +19,31 @@ const publicUser = {
   preferredTime: true,
   createdAt: true,
 } as const;
-const privateUser = { ...publicUser, email: true, role: true } as const;
+
+const privateUser = {
+  ...publicUser,
+  email: true,
+  role: true,
+  isTrainer: true,
+} as const;
 
 // GET /api/users/me
 usersRouter.get('/me', requireAuth, async (req, res) => {
-  const user = await prisma.user.findUnique({ where: { id: req.user!.id }, select: privateUser });
+  const user = await prisma.user.findUnique({
+    where: { id: req.user!.id },
+    select: privateUser,
+  });
   res.json(user);
 });
 
 // PATCH /api/users/me
 usersRouter.patch('/me', requireAuth, async (req, res) => {
   const data = updateProfileSchema.parse(req.body);
-  const user = await prisma.user.update({ where: { id: req.user!.id }, data, select: privateUser });
+  const user = await prisma.user.update({
+    where: { id: req.user!.id },
+    data,
+    select: privateUser,
+  });
   res.json(user);
 });
 
@@ -40,9 +53,16 @@ usersRouter.get('/me/workouts', requireAuth, async (req, res) => {
   const include = workoutInclude(userId);
 
   const [organized, joined] = await Promise.all([
-    prisma.workout.findMany({ where: { creatorId: userId }, include, orderBy: { startTime: 'asc' } }),
     prisma.workout.findMany({
-      where: { registrations: { some: { userId } }, NOT: { creatorId: userId } },
+      where: { creatorId: userId },
+      include,
+      orderBy: { startTime: 'asc' },
+    }),
+    prisma.workout.findMany({
+      where: {
+        registrations: { some: { userId } },
+        NOT: { creatorId: userId },
+      },
       include,
       orderBy: { startTime: 'asc' },
     }),
@@ -59,10 +79,23 @@ usersRouter.get('/:id', async (req, res) => {
   const { id } = idParam.parse(req.params);
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { ...publicUser, _count: { select: { createdWorkouts: true, registrations: true } } },
+    select: {
+      ...publicUser,
+      _count: {
+        select: {
+          createdWorkouts: true,
+          registrations: true,
+        },
+      },
+    },
   });
+
   if (!user) throw notFound('User');
 
   const { _count, ...rest } = user;
-  res.json({ ...rest, workoutsOrganized: _count.createdWorkouts, workoutsJoined: _count.registrations });
+  res.json({
+    ...rest,
+    workoutsOrganized: _count.createdWorkouts,
+    workoutsJoined: _count.registrations,
+  });
 });

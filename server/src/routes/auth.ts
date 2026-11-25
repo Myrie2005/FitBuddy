@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
@@ -33,7 +32,8 @@ const loginSchema = z.object({
 
 // POST /api/auth/register
 authRouter.post('/register', async (req, res) => {
-  const { name, email, password } = registerSchema.parse(req.body);
+  const { name, email, password } =
+    registerSchema.parse(req.body);
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -49,12 +49,18 @@ authRouter.post('/register', async (req, res) => {
 
   try {
     user = await prisma.user.create({
-      data: { name, email, passwordHash },
+      data: {
+        name,
+        email,
+        passwordHash,
+        isTrainer: false,
+      },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        isTrainer: true,
       },
     });
   } catch (error) {
@@ -112,6 +118,7 @@ authRouter.post('/login', async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      isTrainer: user.isTrainer,
     },
   });
 });

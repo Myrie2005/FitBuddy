@@ -1,3 +1,4 @@
+
 /**
  * Demo data: npm run db:reset-demo
  * DELETES ALL DATA in the database and inserts a few users and upcoming workouts.
@@ -47,10 +48,10 @@ async function main() {
 
   const [admin, moshe, miri, sara, amit] = await Promise.all([
     prisma.user.create({ data: { name: 'Admin', email: 'admin@fitbuddy.dev', passwordHash: NO_PASSWORD, role: 'ADMIN' } }),
-    prisma.user.create({ data: { name: 'משה קלין', email: 'moshe@fitbuddy.dev', passwordHash: NO_PASSWORD, area: 'ירושלים', level: 'INTERMEDIATE', preferredCategory: 'RUNNING', preferredTime: 'ערב' } }),
-    prisma.user.create({ data: { name: 'מירי', email: 'miri@fitbuddy.dev', passwordHash: NO_PASSWORD, area: 'ירושלים', level: 'ADVANCED', preferredCategory: 'STRENGTH', preferredTime: '20:00' } }),
-    prisma.user.create({ data: { name: 'שרה', email: 'sara@fitbuddy.dev', passwordHash: NO_PASSWORD, area: 'ירושלים', level: 'ALL' } }),
-    prisma.user.create({ data: { name: 'עמית', email: 'amit@fitbuddy.dev', passwordHash: NO_PASSWORD, area: 'ירושלים', level: 'INTERMEDIATE' } }),
+    prisma.user.create({ data: { name: 'משה קלין', email: 'moshe@fitbuddy.dev', passwordHash: NO_PASSWORD, isTrainer: true, area: 'ירושלים', level: 'INTERMEDIATE', preferredCategory: 'RUNNING', preferredTime: 'ערב' } }),
+    prisma.user.create({ data: { name: 'מירי', email: 'miri@fitbuddy.dev', passwordHash: NO_PASSWORD, isTrainer: true, area: 'ירושלים', level: 'ADVANCED', preferredCategory: 'STRENGTH', preferredTime: '20:00' } }),
+    prisma.user.create({ data: { name: 'שרה', email: 'sara@fitbuddy.dev', passwordHash: NO_PASSWORD, isTrainer: true, area: 'ירושלים', level: 'ALL' } }),
+    prisma.user.create({ data: { name: 'עמית', email: 'amit@fitbuddy.dev', passwordHash: NO_PASSWORD, isTrainer: true, area: 'ירושלים', level: 'INTERMEDIATE' } }),
   ]);
 
   const workouts = [
