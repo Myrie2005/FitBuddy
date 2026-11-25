@@ -23,7 +23,7 @@ let admin: TestUser;
 
 beforeEach(async () => {
   await resetDb();
-  organizer = await createUser({ name: 'Organizer' });
+  organizer = await createUser({ name: 'Organizer', isTrainer: true });
   member = await createUser({ name: 'Member' });
   admin = await createUser({ name: 'Admin', role: 'ADMIN' });
 });
@@ -325,5 +325,41 @@ describe('live updates (Socket.IO)', () => {
     const deleted = nextEvent<{ id: string }>('workout:deleted');
     await api().delete(`/api/workouts/${w.id}`).set(organizer.auth);
     expect(await deleted).toEqual({ id: w.id });
+  });
+});
+describe('trainer permissions', () => {
+  it('rejects workout creation by a regular user', async () => {
+    const res = await api()
+      .post('/api/workouts')
+      .set(member.auth)
+      .send(validWorkout());
+
+    expect(res.status).toBe(403);
+  });
+
+  it('allows an admin to create a workout without trainer permissions', async () => {
+    expect(admin.isTrainer).toBe(false);
+
+    const res = await api()
+      .post('/api/workouts')
+      .set(admin.auth)
+      .send(validWorkout());
+
+    expect(res.status).toBe(201);
+  });
+
+  it('allows a trainer to join another trainer workout', async () => {
+    const trainer = await createUser({ isTrainer: true });
+    const w = await createWorkout(organizer);
+
+    const res = await api()
+      .post(`/api/workouts/${w.id}/register`)
+      .set(trainer.auth);
+
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({
+      participants: 2,
+      isRegistered: true,
+    });
   });
 });

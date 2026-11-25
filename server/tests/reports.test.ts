@@ -7,7 +7,7 @@ let organizer: TestUser;
 beforeEach(async () => {
   await resetDb();
   reporter = await createUser();
-  organizer = await createUser();
+  organizer = await createUser({ isTrainer: true });
 });
 
 describe('POST /api/reports', () => {

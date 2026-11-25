@@ -3,7 +3,7 @@ import { Prisma } from '../generated/prisma/client.js';
 import { HttpError, forbidden, notFound } from '../core/errors.js';
 import { prisma } from '../core/prisma.js';
 import { emit } from '../core/socket.js';
-import { optionalAuth, requireAuth } from '../middleware/auth.js';
+import { optionalAuth, requireAuth, requireTrainer } from '../middleware/auth.js';
 import { idParam } from '../schemas/common.js';
 import { createWorkoutSchema, listWorkoutsQuery, updateWorkoutSchema } from '../schemas/workout.js';
 import { toWorkoutDto, workoutInclude } from '../core/workoutDto.js';
@@ -80,8 +80,9 @@ workoutsRouter.get('/:id/participants', async (req, res) => {
   res.json(registrations.map((r) => ({ ...r.user, joinedAt: r.createdAt.toISOString() })));
 });
 
-// POST /api/workouts  - the organizer is registered automatically
-workoutsRouter.post('/', requireAuth, async (req, res) => {
+// POST /api/workouts - approved trainers and admins only.
+// The organizer is registered automatically.
+workoutsRouter.post('/', requireAuth, requireTrainer, async (req, res) => {
   const data = createWorkoutSchema.parse(req.body);
   const userId = req.user!.id;
 

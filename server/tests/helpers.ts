@@ -19,7 +19,14 @@ export async function resetDb() {
 let userCounter = 0;
 
 /** Creates a user directly in the DB and returns it with a ready-to-use auth header. */
-export async function createUser(overrides: { name?: string; role?: Role; isBlocked?: boolean } = {}) {
+export async function createUser(
+  overrides: {
+    name?: string;
+    role?: Role;
+    isBlocked?: boolean;
+    isTrainer?: boolean;
+  } = {}
+) {
   userCounter += 1;
   const user = await prisma.user.create({
     data: {
@@ -28,15 +35,20 @@ export async function createUser(overrides: { name?: string; role?: Role; isBloc
       passwordHash: 'test',
       role: overrides.role ?? 'USER',
       isBlocked: overrides.isBlocked ?? false,
+      isTrainer: overrides.isTrainer ?? false,
     },
   });
-  return { ...user, auth: { Authorization: `Bearer ${signToken(user.id)}` } };
+  return {
+    ...user,
+    auth: { Authorization: `Bearer ${signToken(user.id)}` },
+  };
 }
 
 export type TestUser = Awaited<ReturnType<typeof createUser>>;
 
 /** A date `hours` from now, as an ISO string. */
-export const inHours = (hours: number) => new Date(Date.now() + hours * 3600_000).toISOString();
+export const inHours = (hours: number) =>
+  new Date(Date.now() + hours * 3600_000).toISOString();
 
 export const validWorkout = (overrides: Record<string, unknown> = {}) => ({
   title: 'ריצת ערב',
@@ -48,8 +60,24 @@ export const validWorkout = (overrides: Record<string, unknown> = {}) => ({
 });
 
 /** Creates a workout through the API (so the organizer is registered like in real use). */
-export async function createWorkout(organizer: TestUser, overrides: Record<string, unknown> = {}) {
-  const res = await api().post('/api/workouts').set(organizer.auth).send(validWorkout(overrides));
-  if (res.status !== 201) throw new Error(`createWorkout failed: ${res.status} ${JSON.stringify(res.body)}`);
-  return res.body as { id: string; participants: number; [key: string]: unknown };
+export async function createWorkout(
+  organizer: TestUser,
+  overrides: Record<string, unknown> = {}
+) {
+  const res = await api()
+    .post('/api/workouts')
+    .set(organizer.auth)
+    .send(validWorkout(overrides));
+
+  if (res.status !== 201) {
+    throw new Error(
+      `createWorkout failed: ${res.status} ${JSON.stringify(res.body)}`
+    );
+  }
+
+  return res.body as {
+    id: string;
+    participants: number;
+    [key: string]: unknown;
+  };
 }
