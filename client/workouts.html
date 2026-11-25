@@ -42,31 +42,48 @@
 
         <div class="filter-bar">
             <select id="category-filter" class="filter-select" onchange="renderFilteredWorkouts()">
-                <option value="הכל">כל ענפי הספורט</option>
-                <option value="ריצה">ריצה</option>
-                <option value="כוח">כוח</option>
-                <option value="כדורסל">כדורסל</option>
-                <option value="כדורגל">כדורגל</option>
-                <option value="טניס">טניס</option>
-                <option value="יוגה">יוגה</option>
-                <option value="אופניים">אופניים</option>
-                <option value="הליכה">הליכה</option>
+                <option value="ALL">כל ענפי הספורט</option>
+                <option value="RUNNING">ריצה</option>
+                <option value="STRENGTH">כוח</option>
+                <option value="BASKETBALL">כדורסל</option>
+                <option value="FOOTBALL">כדורגל</option>
+                <option value="TENNIS">טניס</option>
+                <option value="YOGA">יוגה</option>
+                <option value="CYCLING">אופניים</option>
+                <option value="WALKING">הליכה</option>
             </select>
             <input type="text" id="search-input" class="filter-input" placeholder="🔍 חפש לפי שם אימון או מיקום..." oninput="renderFilteredWorkouts()">
         </div>
 
-        <div id="workouts-cards-list" class="cards-list"></div>
+        <div id="workouts-cards-list" class="cards-list">
+            <div style="text-align:center; padding: 40px; color:#64748b; background:white; border-radius:16px;">טוען אימונים מהשרת...</div>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
-<script src="js/store.js"></script>
+    <script src="js/store.js"></script>
     <script>
         initNavbar('workouts');
+
+        const HE_SPORT_TO_ENUM = {
+            'ריצה': 'RUNNING',
+            'כוח': 'STRENGTH',
+            'כדורסל': 'BASKETBALL',
+            'כדורגל': 'FOOTBALL',
+            'טניס': 'TENNIS',
+            'יוגה': 'YOGA',
+            'אופניים': 'CYCLING',
+            'הליכה': 'WALKING'
+        };
 
         const urlParams = new URLSearchParams(window.location.search);
         const sportParam = urlParams.get('sport');
         if (sportParam) {
-            document.getElementById('category-filter').value = sportParam;
+            const mapped = HE_SPORT_TO_ENUM[sportParam] || sportParam;
+            const selectEl = document.getElementById('category-filter');
+            if ([...selectEl.options].some(opt => opt.value === mapped)) {
+                selectEl.value = mapped;
+            }
         }
 
         function setSearchTab(tabBtn) {
@@ -79,18 +96,31 @@
             const categoryVal = document.getElementById('category-filter').value;
 
             const filtered = getWorkouts().filter(w => {
-                const matchCat = categoryVal === 'הכל' || w.category === categoryVal;
-                const matchSearch = w.title.toLowerCase().includes(searchVal) || w.location.toLowerCase().includes(searchVal);
+                const matchCat = categoryVal === 'ALL' || w.category === categoryVal;
+                const matchSearch =
+                    (w.title || '').toLowerCase().includes(searchVal) ||
+                    (w.location || '').toLowerCase().includes(searchVal);
                 return matchCat && matchSearch;
             });
 
             const container = document.getElementById('workouts-cards-list');
             container.innerHTML = filtered.length > 0 ?
                 filtered.map(createCardHTML).join('') :
-                '<div style="text-align:center; padding: 40px; color:#64748b; background:white; border-radius:16px;">לא נמצאו אימונים המתאימים לחיפוש.</div>';
+                '<div style="text-align:center; padding: 40px; color:#64748b; background:white; border-radius:16px;">לא נמצאו אימונים פתוחים המתאימים לחיפוש.</div>';
         }
 
-        renderFilteredWorkouts();
+        async function loadWorkoutsPage() {
+            const container = document.getElementById('workouts-cards-list');
+            try {
+                await fetchWorkoutsFromServer();
+                renderFilteredWorkouts();
+            } catch (error) {
+                console.error('Failed to load workouts:', error);
+                container.innerHTML = '<div style="text-align:center; padding: 40px; color:#dc2626; background:white; border-radius:16px;">לא הצלחנו לטעון אימונים מהשרת כרגע. ודאי שהשרת פעיל ונסי שוב.</div>';
+            }
+        }
+
+        loadWorkoutsPage();
     </script>
 </body>
 
