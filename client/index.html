@@ -45,28 +45,45 @@
         </div>
 
         <div class="sports-grid">
-            <a href="workouts.html?sport=ריצה" class="sport-pill"><span class="sport-icon">🏃‍♂️</span><span class="sport-name">ריצה</span></a>
-            <a href="workouts.html?sport=כוח" class="sport-pill"><span class="sport-icon">💪</span><span class="sport-name">כוח וכושר</span></a>
-            <a href="workouts.html?sport=כדורסל" class="sport-pill"><span class="sport-icon">🏀</span><span class="sport-name">כדורסל</span></a>
-            <a href="workouts.html?sport=כדורגל" class="sport-pill"><span class="sport-icon">⚽</span><span class="sport-name">כדורגל</span></a>
-            <a href="workouts.html?sport=טניס" class="sport-pill"><span class="sport-icon">🎾</span><span class="sport-name">טניס / פדל</span></a>
-            <a href="workouts.html?sport=יוגה" class="sport-pill"><span class="sport-icon">🧘‍♀️</span><span class="sport-name">יוגה ופילאטיס</span></a>
-            <a href="workouts.html?sport=אופניים" class="sport-pill"><span class="sport-icon">🚴‍♂️</span><span class="sport-name">רכיבת אופניים</span></a>
-            <a href="workouts.html?sport=הליכה" class="sport-pill"><span class="sport-icon">🚶‍♀️</span><span class="sport-name">הליכה</span></a>
+            <a href="workouts.html?sport=RUNNING" class="sport-pill"><span class="sport-icon">🏃‍♂️</span><span class="sport-name">ריצה</span></a>
+            <a href="workouts.html?sport=STRENGTH" class="sport-pill"><span class="sport-icon">💪</span><span class="sport-name">כוח וכושר</span></a>
+            <a href="workouts.html?sport=BASKETBALL" class="sport-pill"><span class="sport-icon">🏀</span><span class="sport-name">כדורסל</span></a>
+            <a href="workouts.html?sport=FOOTBALL" class="sport-pill"><span class="sport-icon">⚽</span><span class="sport-name">כדורגל</span></a>
+            <a href="workouts.html?sport=TENNIS" class="sport-pill"><span class="sport-icon">🎾</span><span class="sport-name">טניס / פדל</span></a>
+            <a href="workouts.html?sport=YOGA" class="sport-pill"><span class="sport-icon">🧘‍♀️</span><span class="sport-name">יוגה ופילאטיס</span></a>
+            <a href="workouts.html?sport=CYCLING" class="sport-pill"><span class="sport-icon">🚴‍♂️</span><span class="sport-name">רכיבת אופניים</span></a>
+            <a href="workouts.html?sport=WALKING" class="sport-pill"><span class="sport-icon">🚶‍♀️</span><span class="sport-name">הליכה</span></a>
         </div>
 
         <div class="section-header">
             <h3 class="section-title">אימונים חמים בסביבה שלך:</h3>
             <a href="workouts.html" style="text-decoration:none; color:#4361ee; font-weight:600;">לכל האימונים ←</a>
         </div>
-        <div id="home-cards-list" class="cards-list"></div>
+        <div id="home-cards-list" class="cards-list">
+            <div style="text-align:center; padding: 30px; color:#64748b; background:white; border-radius:16px;">טוען אימונים קרובים...</div>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
-<script src="js/store.js"></script>
+    <script src="js/store.js"></script>
     <script>
         initNavbar('home');
-        document.getElementById('home-cards-list').innerHTML = getWorkouts().slice(0, 3).map(createCardHTML).join('');
+
+        async function loadHomeWorkouts() {
+            const container = document.getElementById('home-cards-list');
+            try {
+                const list = await fetchWorkoutsFromServer();
+                const topThree = list.slice(0, 3);
+                container.innerHTML = topThree.length > 0 ?
+                    topThree.map(createCardHTML).join('') :
+                    '<div style="text-align:center; padding: 30px; color:#64748b; background:white; border-radius:16px;">אין כרגע אימונים פתוחים. מאמנים יכולים לפתוח אימון חדש בלחיצה על "פתיחת אימון"!</div>';
+            } catch (error) {
+                console.error('Failed to load home workouts:', error);
+                container.innerHTML = '<div style="text-align:center; padding: 30px; color:#dc2626; background:white; border-radius:16px;">לא ניתן לטעון אימונים כרגע.</div>';
+            }
+        }
+
+        loadHomeWorkouts();
     </script>
 </body>
 

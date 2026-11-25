@@ -1,71 +1,58 @@
-const defaultWorkouts = [{
-        id: 1,
-        title: 'ריצת ערב קבוצתית',
-        category: 'ריצה',
-        level: 'חובבני',
-        location: 'גן סאקר, ירושלים',
-        time: '19:00',
-        date: '2026-11-18',
-        maxParticipants: 12,
-        cost: 0,
-        wazeUrl: '',
-        notes: 'נפגשים ליד הכניסה הראשית, קצב 5:30 קליל',
-        organizer: 'משה',
-        isMine: false
-    },
-    {
-        id: 2,
-        title: 'אימון כוח ואירובי',
-        category: 'כוח',
-        level: 'חובבני',
-        location: 'בית וגן, ירושלים',
-        time: '20:30',
-        date: '2026-11-19',
-        maxParticipants: 10,
-        cost: 0,
-        wazeUrl: '',
-        notes: 'מומלץ להביא מזרן אישי ובקבוק מים',
-        organizer: 'מירי',
-        isMine: true
-    },
-    {
-        id: 3,
-        title: 'יוגה בשקיעה',
-        category: 'יוגה',
-        level: 'לכולם',
-        location: 'פארק המסילה',
-        time: '17:30',
-        date: '2026-11-20',
-        maxParticipants: 15,
-        cost: 0,
-        wazeUrl: '',
-        notes: '',
-        organizer: 'שרה',
-        isMine: false
-    },
-    {
-        id: 4,
-        title: 'משחק כדורסל 3v3',
-        category: 'כדורסל',
-        level: 'בינוני',
-        location: 'מגרש ספורטק',
-        time: '18:00',
-        date: '2026-11-21',
-        maxParticipants: 6,
-        cost: 0,
-        wazeUrl: '',
-        notes: '',
-        organizer: 'עמית',
-        isMine: false
-    }
-];
+const WORKOUT_CATEGORY_LABELS = {
+    RUNNING: 'ריצה',
+    WALKING: 'הליכה',
+    STRENGTH: 'כוח',
+    YOGA: 'יוגה',
+    BASKETBALL: 'כדורסל',
+    FOOTBALL: 'כדורגל',
+    TENNIS: 'טניס',
+    CYCLING: 'אופניים'
+};
+
+const WORKOUT_LEVEL_LABELS = {
+    ALL: 'לכולם',
+    BEGINNER: 'מתחילים',
+    INTERMEDIATE: 'בינוני',
+    ADVANCED: 'מתקדמים'
+};
+
+let workoutsCache = [];
 
 function getWorkouts() {
-    return JSON.parse(localStorage.getItem('fitbuddy_workouts')) || defaultWorkouts;
+    return workoutsCache;
 }
 
-function saveWorkouts(list) {
-    localStorage.setItem('fitbuddy_workouts', JSON.stringify(list));
+async function fetchWorkoutsFromServer(params = {}) {
+    const query = new URLSearchParams();
+    if (params.category && params.category !== 'ALL') {
+        query.set('category', params.category);
+    }
+    if (params.q && params.q.trim() !== '') {
+        query.set('q', params.q.trim());
+    }
+
+    const qs = query.toString();
+    const path = qs ? `/api/workouts?${qs}` : '/api/workouts';
+    const list = await apiFetch(path);
+    workoutsCache = Array.isArray(list) ? list : [];
+    return workoutsCache;
+}
+
+function formatServerWorkoutDateTime(isoString) {
+    const d = new Date(isoString);
+    if (Number.isNaN(d.getTime())) {
+        return { dateStr: '', timeStr: '' };
+    }
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+
+    return {
+        dateStr: `${day}/${month}/${year}`,
+        timeStr: `${hours}:${minutes}`
+    };
 }
 
 // Authentication and user permissions
@@ -97,7 +84,6 @@ function setLoggedInUser(user, token) {
     sessionStorage.setItem('fitbuddy_token', token);
     sessionStorage.setItem('fitbuddy_user', JSON.stringify(user));
 
-    // Remove old simulated authentication data.
     localStorage.removeItem('fitbuddy_logged_in');
     localStorage.removeItem('fitbuddy_user_name');
     localStorage.removeItem('fitbuddy_user_role');
@@ -118,7 +104,6 @@ function canCreateWorkout() {
     return isAdmin() || isTrainer();
 }
 
-// Compatibility with existing client pages.
 function getUserRole() {
     return canCreateWorkout() ? 'trainer' : 'trainee';
 }
@@ -263,7 +248,7 @@ function initNavbar(activePage) {
     }
 }
 
-// Existing workout functionality
+// Workout helpers
 
 function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -295,8 +280,9 @@ function getWazeLink(w) {
 function getGoogleCalendarLink(w) {
     const title = encodeURIComponent('FitBuddy: ' + w.title);
     const location = encodeURIComponent(w.location);
+    const noteText = w.description || w.notes || '';
     const details = encodeURIComponent(
-        (w.notes ? w.notes + '\n' : '') +
+        (noteText ? noteText + '\n' : '') +
         'ניווט Waze: ' + getWazeLink(w)
     );
 
@@ -304,18 +290,20 @@ function getGoogleCalendarLink(w) {
 }
 
 function copyInviteText(id) {
-    const w = getWorkouts().find(item => item.id === id);
+    const w = workoutsCache.find(item => String(item.id) === String(id));
 
     if (!w) return;
 
-    const text = `🏃‍♂️ בואו להתאמן איתי ב-FitBuddy!\n📌 ${w.title} (${w.category})\n📅 ${w.date || 'בקרוב'} בשעה ${w.time}\n📍 ${w.location}\n🚗 ניווט ב-Waze: ${getWazeLink(w)}`;
+    const { dateStr, timeStr } = formatServerWorkoutDateTime(w.startTime);
+    const categoryHe = WORKOUT_CATEGORY_LABELS[w.category] || w.category;
+    const text = `🏃‍♂️ בואו להתאמן איתי ב-FitBuddy!\n📌 ${w.title} (${categoryHe})\n📅 ${dateStr || 'בקרוב'} בשעה ${timeStr}\n📍 ${w.location}\n🚗 ניווט ב-Waze: ${getWazeLink(w)}`;
 
     navigator.clipboard.writeText(text).then(() => {
         alert('הזמנה לאימון הועתקה! אפשר להדביק ולשלוח בוואטסאפ 📲');
     });
 }
 
-function joinWorkout(id) {
+async function joinWorkout(id, btnElement) {
     if (!isUserLoggedIn()) {
         sessionStorage.setItem(
             'fitbuddy_auth_notice',
@@ -331,50 +319,84 @@ function joinWorkout(id) {
         return;
     }
 
-    const list = getWorkouts();
-    const w = list.find(item => item.id === id);
+    if (btnElement) {
+        btnElement.disabled = true;
+        btnElement.textContent = 'מצטרף...';
+    }
 
-    if (w) {
-        w.isMine = true;
-        saveWorkouts(list);
+    try {
+        const updated = await apiFetch(`/api/workouts/${encodeURIComponent(id)}/register`, {
+            method: 'POST'
+        });
 
-        alert('נרשמת בהצלחה לאימון "' + w.title + '"! תוכל לראות אותו בדשבורד שלך.');
+        const idx = workoutsCache.findIndex(item => String(item.id) === String(id));
+        if (idx !== -1 && updated) {
+            workoutsCache[idx] = updated;
+        }
+
+        if (btnElement) {
+            btnElement.textContent = 'רשום ✓';
+            btnElement.style.background = '#94a3b8';
+            btnElement.style.cursor = 'default';
+        }
+
+        alert('נרשמת בהצלחה לאימון! תוכל לראות אותו בדשבורד הפרופיל שלך.');
+    } catch (error) {
+        if (btnElement) {
+            btnElement.disabled = false;
+            btnElement.textContent = 'הצטרף';
+        }
+        alert(error.message || 'לא ניתן להצטרף לאימון כרגע');
     }
 }
 
 function createCardHTML(workout) {
-    const wazeHref = escapeHTML(getWazeLink(workout));
+    if (!workout || !workout.id) {
+        return '';
+    }
 
-    const notesHTML = workout.notes
-        ? `<div class="card-notes">📝 ${escapeHTML(workout.notes)}</div>`
+    const safeId = escapeHTML(workout.id);
+    const wazeHref = escapeHTML(getWazeLink(workout));
+    const categoryHe = WORKOUT_CATEGORY_LABELS[workout.category] || workout.category;
+    const levelHe = WORKOUT_LEVEL_LABELS[workout.level] || workout.level || 'לכולם';
+    const organizerName = workout.organizer?.name || workout.organizer || 'מארגן';
+    const { dateStr, timeStr } = formatServerWorkoutDateTime(workout.startTime);
+    const notesText = workout.description || workout.notes || '';
+    const notesHTML = notesText
+        ? `<div class="card-notes">📝 ${escapeHTML(notesText)}</div>`
         : '';
 
-    const workoutId = Number(workout.id);
-
-    if (!Number.isSafeInteger(workoutId)) {
-        return '';
+    let actionButtonHTML = `<button type="button" class="btn-join" onclick="joinWorkout('${safeId}', this)">הצטרף</button>`;
+    if (workout.isOrganizer) {
+        actionButtonHTML = `<button type="button" class="btn-join" style="background:#4361ee;" onclick="window.location.href='profile.html'">האימון שלך</button>`;
+    } else if (workout.isRegistered) {
+        actionButtonHTML = `<button type="button" class="btn-join" style="background:#94a3b8; cursor:default;" disabled>רשום ✓</button>`;
+    } else if (workout.isFull) {
+        actionButtonHTML = `<button type="button" class="btn-join" style="background:#cbd5e1; color:#475569; cursor:not-allowed;" disabled>מלא</button>`;
     }
 
     return `
         <div class="card">
             <div style="flex:1;">
-                <span class="card-tag">${escapeHTML(workout.category)}</span>
-                <span class="card-tag" style="background:#f1f5f9; color:#475569; margin-right:6px;">${escapeHTML(workout.level || 'חובבני')}</span>
+                <span class="card-tag">${escapeHTML(categoryHe)}</span>
+                <span class="card-tag" style="background:#f1f5f9; color:#475569; margin-right:6px;">${escapeHTML(levelHe)}</span>
                 <span class="card-tag" style="background:#ecfdf5; color:#047857; margin-right:6px;">${workout.cost > 0 ? escapeHTML(workout.cost) + ' ₪' : 'חינם'}</span>
                 <div class="card-title">${escapeHTML(workout.title)}</div>
                 <div class="card-details">
                     <span>📍 ${escapeHTML(workout.location)}</span>
-                    <span>📅 ${escapeHTML(workout.date || '')} • ⏰ ${escapeHTML(workout.time)}</span>
-                    <span>👤 מארגן: ${escapeHTML(workout.organizer)}</span>
+                    <span>📅 ${escapeHTML(dateStr)} • ⏰ ${escapeHTML(timeStr)}</span>
+                    <span>👤 מארגן: ${escapeHTML(organizerName)}</span>
+                    <span>👥 ${workout.participants ?? 0}/${workout.maxParticipants} משתתפים</span>
                     <a href="${wazeHref}" target="_blank" rel="noopener" class="waze-badge">🚗 נווט ב-Waze</a>
-                    <button type="button" class="share-btn-mini" onclick="copyInviteText(${workoutId})">📲 שתף הזמנה</button>
+                    <button type="button" class="share-btn-mini" onclick="copyInviteText('${safeId}')">📲 שתף הזמנה</button>
                 </div>
                 ${notesHTML}
             </div>
-            <button class="btn-join" onclick="joinWorkout(${workoutId})">הצטרף</button>
+            ${actionButtonHTML}
         </div>
     `;
 }
+
 async function syncAuthSession() {
     if (!isUserLoggedIn()) {
         return;

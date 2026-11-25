@@ -34,37 +34,61 @@
 
         <div class="profile-grid">
             <div class="profile-sidebar">
-                <div class="profile-big-avatar" id="profile-big-avatar">מ</div>
-                <h2 id="profile-user-name" style="font-size: 1.4rem; color: #1a202c;">מירי</h2>
+                <div class="profile-big-avatar" id="profile-big-avatar">...</div>
+                <h2 id="profile-user-name" style="font-size: 1.4rem; color: #1a202c;">טוען...</h2>
                 <button id="edit-profile-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 8px 16px; font-size: 0.9rem;">✏️ עריכת פרופיל</button>
                 <br>
-                <span class="card-tag" style="margin-top: 8px;">חברה פעילה ב-FitBuddy</span>
+                <span id="profile-role-badge" class="card-tag" style="margin-top: 8px;">טוען תפקיד...</span>
 
                 <div class="profile-stats">
-                    <div class="stat-box"><strong id="my-workouts-count">1</strong><span>הפעילויות שלי</span></div>
-                    <div class="stat-box"><strong>8</strong><span>שותפים</span></div>
+                    <div class="stat-box"><strong id="my-workouts-count">0</strong><span>הפעילויות שלי</span></div>
+                    <div class="stat-box"><strong id="organized-workouts-count">0</strong><span>אימונים שיצרתי</span></div>
                     <div class="stat-box"><strong>4.9 ⭐</strong><span>דירוג</span></div>
                 </div>
 
                 <div class="profile-details-list" id="display-details">
-                    <p><strong>📍 אזור אימונים:</strong> <span id="loc-text">בית וגן, ירושלים</span></p>
-                    <p><strong>💪 רמת כושר:</strong> <span id="level-text">מתקדמת</span></p>
-                    <p><strong>🏃‍♀️ ספורט מועדף:</strong> <span id="sport-text">ריצה, כוח והליכה</span></p>
-                    <p><strong>⏰ זמינות:</strong> <span id="time-text">שעות הערב (18:00–21:00)</span></p>
+                    <p><strong>📍 אזור אימונים:</strong> <span id="loc-text">טוען...</span></p>
+                    <p><strong>💪 רמת כושר:</strong> <span id="level-text">טוען...</span></p>
+                    <p><strong>🏃‍♀️ ספורט מועדף:</strong> <span id="sport-text">טוען...</span></p>
+                    <p><strong>⏰ זמינות:</strong> <span id="time-text">טוען...</span></p>
                 </div>
 
                 <div id="edit-form-section" style="display: none; text-align: right; margin-top: 15px;">
                     <label style="font-size:0.85rem; color:#718096;">שם:</label>
                     <input type="text" id="edit-name" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+
                     <label style="font-size:0.85rem; color:#718096;">אזור אימונים:</label>
-                    <input type="text" id="edit-loc" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+                    <input type="text" id="edit-loc" class="form-control" placeholder="לדוגמה: בית וגן, ירושלים" style="margin-bottom: 8px; padding: 8px;">
+
                     <label style="font-size:0.85rem; color:#718096;">רמת כושר:</label>
-                    <input type="text" id="edit-level" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+                    <select id="edit-level" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+                        <option value="">לא נבחר</option>
+                        <option value="ALL">לכולם</option>
+                        <option value="BEGINNER">מתחילים</option>
+                        <option value="INTERMEDIATE">בינוני</option>
+                        <option value="ADVANCED">מתקדמים</option>
+                    </select>
+
                     <label style="font-size:0.85rem; color:#718096;">ספורט מועדף:</label>
-                    <input type="text" id="edit-sport" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+                    <select id="edit-sport" class="form-control" style="margin-bottom: 8px; padding: 8px;">
+                        <option value="">לא נבחר</option>
+                        <option value="RUNNING">ריצה</option>
+                        <option value="WALKING">הליכה</option>
+                        <option value="STRENGTH">כוח</option>
+                        <option value="YOGA">יוגה</option>
+                        <option value="BASKETBALL">כדורסל</option>
+                        <option value="FOOTBALL">כדורגל</option>
+                        <option value="TENNIS">טניס</option>
+                        <option value="CYCLING">אופניים</option>
+                    </select>
+
                     <label style="font-size:0.85rem; color:#718096;">זמינות:</label>
-                    <input type="text" id="edit-time" class="form-control" style="margin-bottom: 12px; padding: 8px;">
-                    <button id="save-profile-btn" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 1rem;">💾 שמור פרטים</button>
+                    <input type="text" id="edit-time" class="form-control" placeholder="לדוגמה: שעות הערב (18:00–21:00)" style="margin-bottom: 12px; padding: 8px;">
+
+                    <div style="display: flex; gap: 8px;">
+                        <button id="save-profile-btn" type="button" class="btn btn-primary" style="flex: 1; padding: 10px; font-size: 0.95rem;">💾 שמור פרטים</button>
+                        <button id="cancel-profile-btn" type="button" class="btn btn-secondary" style="padding: 10px; font-size: 0.95rem;">ביטול</button>
+                    </div>
                 </div>
             </div>
 
@@ -74,8 +98,9 @@
                         <h3 style="font-size: 1.2rem; color: #1a202c;">📅 הפעילות שלי (שפתחתי / נרשמתי)</h3>
                         <a href="create.html" style="text-decoration:none; background: #ff7b54; color: white; padding: 7px 14px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">+ צור פעילות</a>
                     </div>
-                    <div id="my-managed-workouts-list"></div>
-                    <div id="my-workouts-list" style="display:none;"></div>
+                    <div id="my-managed-workouts-list">
+                        <p style="color:#64748b; font-size:0.95rem;">טוען את הפעילויות שלך...</p>
+                    </div>
                 </div>
                 <hr style="border: 0; border-top: 1px solid #edf2f7; margin-bottom: 20px;">
                 <h3 style="font-size: 1.2rem; color: #1a202c;">🗺️ מפת אימונים בסביבה שלי (ירושלים)</h3>
@@ -90,7 +115,7 @@
         <div class="modal-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
                 <h2 style="font-size: 1.4rem; color: #1e293b;">עריכת פעילות</h2>
-                <button onclick="closeManageModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #64748b;">✕</button>
+                <button type="button" onclick="closeManageModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #64748b;">✕</button>
             </div>
 
             <form onsubmit="saveEditedWorkout(event)">
@@ -103,24 +128,23 @@
                     <div class="form-group">
                         <label>ענף ספורט *</label>
                         <select id="edit-w-category" class="form-control">
-                            <option value="ריצה">ריצה</option>
-                            <option value="כוח">כוח</option>
-                            <option value="כדורסל">כדורסל</option>
-                            <option value="כדורגל">כדורגל</option>
-                            <option value="טניס">טניס</option>
-                            <option value="יוגה">יוגה</option>
-                            <option value="אופניים">אופניים</option>
-                            <option value="הליכה">הליכה</option>
+                            <option value="RUNNING">ריצה</option>
+                            <option value="STRENGTH">כוח</option>
+                            <option value="BASKETBALL">כדורסל</option>
+                            <option value="FOOTBALL">כדורגל</option>
+                            <option value="TENNIS">טניס</option>
+                            <option value="YOGA">יוגה</option>
+                            <option value="CYCLING">אופניים</option>
+                            <option value="WALKING">הליכה</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>רמת משחק</label>
                         <select id="edit-w-level" class="form-control">
-                            <option>חובבני</option>
-                            <option>לכולם</option>
-                            <option>מתחילים</option>
-                            <option>בינוני</option>
-                            <option>מתקדמים</option>
+                            <option value="ALL">לכולם</option>
+                            <option value="BEGINNER">מתחילים</option>
+                            <option value="INTERMEDIATE">בינוני</option>
+                            <option value="ADVANCED">מתקדמים</option>
                         </select>
                     </div>
                 </div>
@@ -173,127 +197,7 @@
     </div>
 
     <script src="js/api.js"></script>
-<script src="js/store.js"></script>
-    <script>
-        if (guardProtectedPage('יש להתחבר כדי לצפות בדשבורד ובפרופיל')) {
-            initNavbar('profile');
-            const user = getCurrentUser();
-            document.getElementById('profile-user-name').textContent = user;
-            document.getElementById('profile-big-avatar').textContent = user[0];
-            renderMyManagedWorkouts();
-        }
-
-        function leaveWorkout(id) {
-            const list = getWorkouts();
-            const w = list.find(item => item.id === id);
-            if (!w) return;
-            w.isMine = false;
-            saveWorkouts(list);
-            renderMyManagedWorkouts();
-        }
-
-        function renderMyManagedWorkouts() {
-            const container = document.getElementById('my-managed-workouts-list');
-            const currentUser = getCurrentUser();
-            const myItems = getWorkouts().filter(w => w.isMine || w.organizer === currentUser);
-            document.getElementById('my-workouts-count').textContent = myItems.length;
-
-            if (myItems.length === 0) {
-                container.innerHTML = '<p style="color:#64748b; font-size:0.95rem;">עדיין לא פתחת או נרשמת לפעילויות. לחץ על "+ צור פעילות" כדי להתחיל!</p>';
-                return;
-            }
-
-            container.innerHTML = myItems.map(w => {
-                const isOrganizer = w.organizer === currentUser;
-                const notesHTML = w.notes ? `<div class="card-notes">📝 ${w.notes}</div>` : '';
-                const actionButton = isOrganizer ?
-                    `<button class="btn-manage-activity" onclick="openManageModal(${w.id})">נהל פעילות</button>` :
-                    `<button onclick="leaveWorkout(${w.id})" style="width:100%; background:#fee2e2; color:#dc2626; padding:10px 18px; border-radius:10px; border:none; font-weight:700; font-size:0.92rem; cursor:pointer; margin-top:14px;">בטל השתתפות</button>`;
-
-                return `
-                    <div class="my-workout-card">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <div style="font-size:1.15rem; font-weight:700; color:#1e293b;">${w.title}</div>
-                                <span class="card-tag" style="margin-top:4px;">${w.category}</span>
-                                <span class="card-tag" style="margin-top:4px; margin-right:6px; background:${isOrganizer ? '#dcfce7' : '#f1f5f9'}; color:${isOrganizer ? '#166534' : '#475569'};">
-                                    ${isOrganizer ? '👑 מארגן' : '👤 משתתף (מארגן: ' + w.organizer + ')'}
-                                </span>
-                            </div>
-                            <span style="background:#e2e8f0; color:#475569; padding:3px 10px; border-radius:12px; font-size:0.8rem; font-weight:600;">${w.level || 'חובבני'}</span>
-                        </div>
-                        <div class="card-details" style="margin-top:8px; font-size:0.88rem;">
-                            <span>📅 ${w.date || 'היום'} • ⏰ ${w.time}</span>
-                            <span>📍 ${w.location}</span>
-                            <span>👥 ${w.maxParticipants || 12} מקומות</span>
-                            <span>💳 ${w.cost > 0 ? w.cost + ' ₪' : 'חינם'}</span>
-                        </div>
-                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-                            <a href="${getWazeLink(w)}" target="_blank" rel="noopener" class="waze-badge">🚗 פתח ב-Waze</a>
-                            <a href="${getGoogleCalendarLink(w)}" target="_blank" rel="noopener" class="waze-badge" style="background:#eef2ff; color:#4361ee;">📅 הוסף ליומן</a>
-                            <button type="button" class="share-btn-mini" onclick="copyInviteText(${w.id})">📲 הזמן חברים</button>
-                        </div>
-                        ${notesHTML}
-                        ${actionButton}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function openManageModal(id) {
-            const w = getWorkouts().find(item => item.id === id);
-            if (!w || w.organizer !== getCurrentUser()) return;
-
-            document.getElementById('edit-workout-id').value = w.id;
-            document.getElementById('edit-w-title').value = w.title;
-            document.getElementById('edit-w-category').value = w.category;
-            document.getElementById('edit-w-level').value = w.level || 'חובבני';
-            document.getElementById('edit-w-date').value = w.date || '';
-            document.getElementById('edit-w-time').value = w.time || '';
-            document.getElementById('edit-w-location').value = w.location;
-            document.getElementById('edit-w-waze').value = w.wazeUrl || '';
-            document.getElementById('edit-w-max').value = w.maxParticipants || 12;
-            document.getElementById('edit-w-cost').value = w.cost || 0;
-            document.getElementById('edit-w-notes').value = w.notes || '';
-
-            document.getElementById('cancel-confirm-box').style.display = 'none';
-            document.getElementById('manage-modal').style.display = 'flex';
-        }
-
-        function closeManageModal() {
-            document.getElementById('manage-modal').style.display = 'none';
-        }
-
-        function saveEditedWorkout(e) {
-            e.preventDefault();
-            const id = Number(document.getElementById('edit-workout-id').value);
-            const list = getWorkouts();
-            const w = list.find(item => item.id === id);
-            if (!w || w.organizer !== getCurrentUser()) return;
-
-            w.title = document.getElementById('edit-w-title').value;
-            w.category = document.getElementById('edit-w-category').value;
-            w.level = document.getElementById('edit-w-level').value;
-            w.date = document.getElementById('edit-w-date').value;
-            w.time = document.getElementById('edit-w-time').value;
-            w.location = document.getElementById('edit-w-location').value;
-            w.wazeUrl = document.getElementById('edit-w-waze').value.trim();
-            w.maxParticipants = Number(document.getElementById('edit-w-max').value) || 12;
-            w.cost = Number(document.getElementById('edit-w-cost').value) || 0;
-            w.notes = document.getElementById('edit-w-notes').value.trim();
-
-            saveWorkouts(list);
-            closeManageModal();
-            renderMyManagedWorkouts();
-        }
-
-        function confirmDeleteWorkout() {
-            const id = Number(document.getElementById('edit-workout-id').value);
-            saveWorkouts(getWorkouts().filter(item => item.id !== id));
-            closeManageModal();
-            renderMyManagedWorkouts();
-        }
-    </script>
+    <script src="js/store.js"></script>
     <script src="js/profile.js"></script>
 </body>
 

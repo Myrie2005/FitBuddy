@@ -43,14 +43,14 @@
                     <div class="form-group">
                         <label>ענף ספורט *</label>
                         <select id="form-category" class="form-control">
-                            <option value="ריצה">ריצה</option>
-                            <option value="כוח">כוח</option>
-                            <option value="כדורסל">כדורסל</option>
-                            <option value="כדורגל">כדורגל</option>
-                            <option value="טניס">טניס</option>
-                            <option value="יוגה">יוגה</option>
-                            <option value="אופניים">אופניים</option>
-                            <option value="הליכה">הליכה</option>
+                            <option value="RUNNING">ריצה</option>
+                            <option value="STRENGTH">כוח</option>
+                            <option value="BASKETBALL">כדורסל</option>
+                            <option value="FOOTBALL">כדורגל</option>
+                            <option value="TENNIS">טניס</option>
+                            <option value="YOGA">יוגה</option>
+                            <option value="CYCLING">אופניים</option>
+                            <option value="WALKING">הליכה</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -89,11 +89,10 @@
                         <div class="form-group">
                             <label>רמת משחק</label>
                             <select id="form-level" class="form-control">
-                                <option>חובבני</option>
-                                <option>לכולם</option>
-                                <option>מתחילים</option>
-                                <option>בינוני</option>
-                                <option>מתקדמים</option>
+                                <option value="ALL">לכולם</option>
+                                <option value="BEGINNER">מתחילים</option>
+                                <option value="INTERMEDIATE">בינוני</option>
+                                <option value="ADVANCED">מתקדמים</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -108,25 +107,25 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit">פרסם פעילות</button>
+                <button type="submit" id="submit-workout-btn" class="btn-submit">פרסם פעילות</button>
             </form>
         </div>
     </div>
 
     <script src="js/api.js"></script>
-<script src="js/store.js"></script>
+    <script src="js/store.js"></script>
     <script>
         async function initializeCreatePage() {
-    const form = document.querySelector('.form-card');
-    form.style.display = 'none';
+            const form = document.querySelector('.form-card');
+            form.style.display = 'none';
 
-    if (await guardTrainerPage()) {
-        initNavbar('create');
-        form.style.display = '';
-    }
-}
+            if (await guardTrainerPage()) {
+                initNavbar('create');
+                form.style.display = '';
+            }
+        }
 
-initializeCreatePage();
+        initializeCreatePage();
 
         function toggleOptionalDetails() {
             const box = document.getElementById('optional-details-box');
@@ -137,29 +136,56 @@ initializeCreatePage();
         }
 
         async function handleCreateWorkout(e) {
-    e.preventDefault();
+            e.preventDefault();
 
-    if (!(await guardTrainerPage())) {
-        return;
-    }
-            const list = getWorkouts();
-            list.unshift({
-                id: Date.now(),
-                title: document.getElementById('form-title').value,
+            if (!(await guardTrainerPage())) {
+                return;
+            }
+
+            const dateVal = document.getElementById('form-date').value;
+            const timeVal = document.getElementById('form-time').value;
+            const startDate = new Date(`${dateVal}T${timeVal}`);
+
+            if (Number.isNaN(startDate.getTime())) {
+                alert('יש לבחור תאריך ושעה תקינים.');
+                return;
+            }
+
+            const payload = {
+                title: document.getElementById('form-title').value.trim(),
                 category: document.getElementById('form-category').value,
                 level: document.getElementById('form-level').value,
-                location: document.getElementById('form-location').value,
-                date: document.getElementById('form-date').value,
-                time: document.getElementById('form-time').value,
+                location: document.getElementById('form-location').value.trim(),
+                startTime: startDate.toISOString(),
                 maxParticipants: Number(document.getElementById('form-max-participants').value) || 14,
-                cost: Number(document.getElementById('form-cost').value) || 0,
-                wazeUrl: document.getElementById('form-waze').value.trim(),
-                notes: document.getElementById('form-notes').value.trim(),
-                organizer: getCurrentUser(),
-                isMine: true
-            });
-            saveWorkouts(list);
-            window.location.href = 'profile.html';
+                cost: Number(document.getElementById('form-cost').value) || 0
+            };
+
+            const wazeVal = document.getElementById('form-waze').value.trim();
+            if (wazeVal) {
+                payload.wazeUrl = wazeVal;
+            }
+
+            const notesVal = document.getElementById('form-notes').value.trim();
+            if (notesVal) {
+                payload.description = notesVal;
+            }
+
+            const submitBtn = document.getElementById('submit-workout-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'מפרסם פעילות...';
+
+            try {
+                await apiFetch('/api/workouts', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                window.location.href = 'profile.html';
+            } catch (error) {
+                alert(error.message || 'שגיאה בפרסום הפעילות. בדקי שכל השדות תקינים ושהתאריך עתידי.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'פרסם פעילות';
+            }
         }
     </script>
 </body>
